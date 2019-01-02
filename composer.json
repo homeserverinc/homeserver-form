@@ -1,0 +1,17 @@
+{
+    "name": "homeserverinc/homeserver-form",
+    "description": "Home Server Form Client Application",
+    "type": "library",
+    "authors": [
+        {
+            "name": "marcioelias",
+            "email": "marcioelias@gmail.com"
+        }
+    ],
+    "require": {},
+    "autoload": {
+        "psr-4": {
+          "HomeServerInc\\API\\": "src/"
+        }
+    }
+}
