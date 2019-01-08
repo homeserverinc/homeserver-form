@@ -13,7 +13,7 @@ try {
 
     require('bootstrap');
     require('velocity-animate/velocity');
-    require('velocity-animate/velocity.ui');
+    //require('velocity-animate/velocity.ui');
 } catch (e) {}
 
 /**
