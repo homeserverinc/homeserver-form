@@ -5,7 +5,7 @@
         </div>
         <div class="list-group hs-answers">
             <div v-for="(answer, index) in answers" :key="index" class="list-group-item list-group-item-action hs-answer">
-                <hs-form-input :uuid="answer.uuid">
+                <hs-form-input :uuid="answer.uuid" :animation-delay="index * 130">
                 </hs-form-input>
             </div>
         </div>

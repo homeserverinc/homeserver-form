@@ -25131,7 +25131,7 @@ module.exports = Vue;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(15);
-module.exports = __webpack_require__(69);
+module.exports = __webpack_require__(72);
 
 
 /***/ }),
@@ -25142,7 +25142,7 @@ module.exports = __webpack_require__(69);
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_HsForm_vue__ = __webpack_require__(42);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_HsForm_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_HsForm_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__store__ = __webpack_require__(66);
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -53043,7 +53043,7 @@ var normalizeComponent = __webpack_require__(1)
 /* script */
 var __vue_script__ = __webpack_require__(43)
 /* template */
-var __vue_template__ = __webpack_require__(62)
+var __vue_template__ = __webpack_require__(65)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -53091,6 +53091,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__HsServicesField___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__HsServicesField__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HsQuestion__ = __webpack_require__(47);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HsQuestion___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__HsQuestion__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__form_controls_HsProgress__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__form_controls_HsProgress___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__form_controls_HsProgress__);
 //
 //
 //
@@ -53116,6 +53118,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -53125,7 +53129,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
   components: {
     'hs-services-field': __WEBPACK_IMPORTED_MODULE_0__HsServicesField___default.a,
-    'hs-question': __WEBPACK_IMPORTED_MODULE_1__HsQuestion___default.a
+    'hs-question': __WEBPACK_IMPORTED_MODULE_1__HsQuestion___default.a,
+    'hs-progress': __WEBPACK_IMPORTED_MODULE_2__form_controls_HsProgress___default.a
   },
   computed: {
     isLoading: function isLoading() {
@@ -53227,6 +53232,17 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       get: function get() {
         return this.$store.state.services;
       }
+    },
+    showMe: function showMe() {
+      if (this.$store.state.services != 'undefined') {
+        if (Array.isArray(this.$store.state.services)) {
+          return this.$store.state.services.length > 1;
+        } else {
+          return false;
+        }
+      } else {
+        return false;
+      }
     }
   }
 });
@@ -53239,69 +53255,71 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "form-group hs-select-container" }, [
-    _c(
-      "label",
-      {
-        staticClass: "form-control-label hs-label",
-        attrs: { for: "selectService" }
-      },
-      [_vm._v("What service do you need?")]
-    ),
-    _vm._v(" "),
-    _c(
-      "select",
-      {
-        directives: [
-          {
-            name: "model",
-            rawName: "v-model",
-            value: _vm.selectService,
-            expression: "selectService"
-          }
-        ],
-        ref: "selectService",
-        staticClass: "form-control selectpicker hs-input-select",
-        attrs: {
-          "data-style": "btn-secondary",
-          "data-live-search": "true",
-          name: "selectService",
-          id: "selectService"
-        },
-        on: {
-          change: function($event) {
-            var $$selectedVal = Array.prototype.filter
-              .call($event.target.options, function(o) {
-                return o.selected
-              })
-              .map(function(o) {
-                var val = "_value" in o ? o._value : o.value
-                return val
-              })
-            _vm.selectService = $event.target.multiple
-              ? $$selectedVal
-              : $$selectedVal[0]
-          }
-        }
-      },
-      [
+  return _vm.showMe
+    ? _c("div", { staticClass: "form-group hs-select-container" }, [
         _c(
-          "option",
-          { attrs: { selected: "selected" }, domProps: { value: null } },
-          [_vm._v(" Nothing Selected ")]
+          "label",
+          {
+            staticClass: "form-control-label hs-label",
+            attrs: { for: "selectService" }
+          },
+          [_vm._v("What service do you need?")]
         ),
         _vm._v(" "),
-        _vm._l(_vm.services, function(service, index) {
-          return _c(
-            "option",
-            { key: index, domProps: { value: service.uuid } },
-            [_vm._v(" " + _vm._s(service.service_description) + " ")]
-          )
-        })
-      ],
-      2
-    )
-  ])
+        _c(
+          "select",
+          {
+            directives: [
+              {
+                name: "model",
+                rawName: "v-model",
+                value: _vm.selectService,
+                expression: "selectService"
+              }
+            ],
+            ref: "selectService",
+            staticClass: "form-control selectpicker hs-input-select",
+            attrs: {
+              "data-style": "btn-secondary",
+              "data-live-search": "true",
+              name: "selectService",
+              id: "selectService"
+            },
+            on: {
+              change: function($event) {
+                var $$selectedVal = Array.prototype.filter
+                  .call($event.target.options, function(o) {
+                    return o.selected
+                  })
+                  .map(function(o) {
+                    var val = "_value" in o ? o._value : o.value
+                    return val
+                  })
+                _vm.selectService = $event.target.multiple
+                  ? $$selectedVal
+                  : $$selectedVal[0]
+              }
+            }
+          },
+          [
+            _c(
+              "option",
+              { attrs: { selected: "selected" }, domProps: { value: null } },
+              [_vm._v(" Nothing Selected ")]
+            ),
+            _vm._v(" "),
+            _vm._l(_vm.services, function(service, index) {
+              return _c(
+                "option",
+                { key: index, domProps: { value: service.uuid } },
+                [_vm._v(" " + _vm._s(service.service_description) + " ")]
+              )
+            })
+          ],
+          2
+        )
+      ])
+    : _vm._e()
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -53456,6 +53474,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__HsRadioInput___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__HsRadioInput__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HsCheckboxInput__ = __webpack_require__(57);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__HsCheckboxInput___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__HsCheckboxInput__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_velocity_animate__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_velocity_animate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_velocity_animate__);
 //
 //
 //
@@ -53464,17 +53484,57 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    uuid: String
+    uuid: String,
+    animationDelay: null
+  },
+  data: function data() {
+    return {
+      duration: 250,
+      showMe: false
+    };
   },
   components: {
     'hs-radio-input': __WEBPACK_IMPORTED_MODULE_1__HsRadioInput___default.a,
     'hs-checkbox-input': __WEBPACK_IMPORTED_MODULE_2__HsCheckboxInput___default.a,
     'hs-text-input': __WEBPACK_IMPORTED_MODULE_0__HsTextInput___default.a
+  },
+  created: function created() {
+    this.showMe = true;
+  },
+  methods: {
+    beforeEnter: function beforeEnter(el) {
+      el.style.opacity = 0;
+    },
+    enter: function enter(el, done) {
+      __WEBPACK_IMPORTED_MODULE_3_velocity_animate___default()(el, {
+        opacity: 1
+      }, {
+        duration: this.duration + this.animationDelay
+      }, {
+        complete: done
+      });
+    },
+    leave: function leave(el, done) {
+      __WEBPACK_IMPORTED_MODULE_3_velocity_animate___default()(el, {
+        opacity: 0
+      }, {
+        duration: this.duration + this.animationDelay
+      }, {
+        complete: done
+      });
+    }
   }
 });
 
@@ -53667,6 +53727,7 @@ module.exports = Component.exports
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
 //
 //
 //
@@ -53903,16 +53964,31 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
-    { staticClass: "hs-input-container" },
+    "transition",
+    {
+      attrs: { appear: "", mode: "out-in", css: false },
+      on: {
+        "before-enter": _vm.beforeEnter,
+        enter: _vm.enter,
+        leave: _vm.leave
+      }
+    },
     [
-      _c("hs-radio-input", { attrs: { uuid: _vm.uuid } }),
-      _vm._v(" "),
-      _c("hs-checkbox-input", { attrs: { uuid: _vm.uuid } }),
-      _vm._v(" "),
-      _c("hs-text-input", { attrs: { uuid: _vm.uuid } })
-    ],
-    1
+      _vm.showMe
+        ? _c(
+            "div",
+            { staticClass: "hs-input-container" },
+            [
+              _c("hs-radio-input", { attrs: { uuid: _vm.uuid } }),
+              _vm._v(" "),
+              _c("hs-checkbox-input", { attrs: { uuid: _vm.uuid } }),
+              _vm._v(" "),
+              _c("hs-text-input", { attrs: { uuid: _vm.uuid } })
+            ],
+            1
+          )
+        : _vm._e()
+    ]
   )
 }
 var staticRenderFns = []
@@ -53949,10 +54025,15 @@ var render = function() {
                 key: index,
                 staticClass: "list-group-item list-group-item-action hs-answer"
               },
-              [_c("hs-form-input", { attrs: { uuid: answer.uuid } })],
+              [
+                _c("hs-form-input", {
+                  attrs: { uuid: answer.uuid, "animation-delay": index * 130 }
+                })
+              ],
               1
             )
-          })
+          }),
+          0
         )
       ])
     : _vm._e()
@@ -53971,6 +54052,113 @@ if (false) {
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var disposed = false
+var normalizeComponent = __webpack_require__(1)
+/* script */
+var __vue_script__ = __webpack_require__(63)
+/* template */
+var __vue_template__ = __webpack_require__(64)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources/js/components/form_controls/HsProgress.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-d56ddc7e", Component.options)
+  } else {
+    hotAPI.reload("data-v-d56ddc7e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 63 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  computed: {
+    min: function min() {
+      return 0;
+    },
+    max: function max() {
+      return this.$store.getters.progressMax;
+    },
+    current: function current() {
+      return 0;
+    }
+  }
+});
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "progress hs-progress", staticStyle: { height: "3px" } },
+    [
+      _c("div", {
+        staticClass: "progress-bar bg-success hs-progress-bar",
+        attrs: {
+          role: "progressbar",
+          "aria-valuenow": _vm.current,
+          "aria-valuemin": _vm.min,
+          "aria-valuemax": _vm.max
+        }
+      })
+    ]
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-d56ddc7e", module.exports)
+  }
+}
+
+/***/ }),
+/* 65 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var render = function() {
   var _vm = this
   var _h = _vm.$createElement
@@ -53986,42 +54174,49 @@ var render = function() {
           [
             _c("hs-services-field"),
             _vm._v(" "),
-            _c("div", { staticClass: "card hs-card" }, [
-              _c("div", { staticClass: "card-header hs-card-header" }, [
-                _c("span", { staticClass: "hs-card-title" }, [
-                  _vm._v(_vm._s(_vm.title))
+            _c(
+              "div",
+              { staticClass: "card hs-card" },
+              [
+                _c("div", { staticClass: "card-header hs-card-header" }, [
+                  _c("span", { staticClass: "hs-card-title" }, [
+                    _vm._v(_vm._s(_vm.title))
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("hs-progress"),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  { staticClass: "card-body hs-card-body" },
+                  [_c("hs-question")],
+                  1
+                ),
+                _vm._v(" "),
+                _c("div", { staticClass: "card-footer hs-card-footer" }, [
+                  _c("div", { staticClass: "float-right" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn hs-btn-prev hs-btn-prev",
+                        on: { click: _vm.previousQuestion }
+                      },
+                      [_vm._v("Previous")]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn hs-btn-next hs-btn-next",
+                        on: { click: _vm.nextQuestion }
+                      },
+                      [_vm._v("Next")]
+                    )
+                  ])
                 ])
-              ]),
-              _vm._v(" "),
-              _c(
-                "div",
-                { staticClass: "card-body hs-card-body" },
-                [_c("hs-question")],
-                1
-              ),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-footer hs-card-footer" }, [
-                _c("div", { staticClass: "float-right" }, [
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn hs-btn-prev hs-btn-prev",
-                      on: { click: _vm.previousQuestion }
-                    },
-                    [_vm._v("Previous")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "button",
-                    {
-                      staticClass: "btn hs-btn-next hs-btn-next",
-                      on: { click: _vm.nextQuestion }
-                    },
-                    [_vm._v("Next")]
-                  )
-                ])
-              ])
-            ])
+              ],
+              1
+            )
           ],
           1
         )
@@ -54038,18 +54233,18 @@ if (false) {
 }
 
 /***/ }),
-/* 63 */
+/* 66 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator__ = __webpack_require__(64);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator__ = __webpack_require__(67);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__babel_runtime_regenerator__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue__ = __webpack_require__(13);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vuex__ = __webpack_require__(67);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vuex__ = __webpack_require__(70);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_axios__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_axios___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_axios__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__constants__ = __webpack_require__(68);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__constants__ = __webpack_require__(71);
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -54083,10 +54278,14 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
     },
     question: function question(state) {
       return function (uuid) {
-        if (state.quiz.questions.length > 0) {
-          return state.quiz.questions.find(function (question) {
-            return question.uuid === uuid;
-          });
+        if (state.quiz.questions != 'undefined') {
+          if (state.quiz.questions.length > 0) {
+            return state.quiz.questions.find(function (question) {
+              return question.uuid === uuid;
+            });
+          } else {
+            return {};
+          }
         } else {
           return {};
         }
@@ -54095,7 +54294,7 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
     answers: function answers(state) {
       if (typeof state.currentQuestion.answers !== 'undefined') {
         return state.currentQuestion.answers.sort(function (a, b) {
-          return a.answer_order > b.answer_order;
+          return a.answer_order - b.answer_order;
         });
       } else {
         return false;
@@ -54148,6 +54347,12 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
     },
     prevQuestion: function prevQuestion(state) {
       return state.answeredQuestions.slice(-1)[0];
+    },
+    progressMax: function progressMax(state) {
+      return 0; //(state.quiz.questions != 'undefined') ? state.quiz.questions.length : 0;
+    },
+    progressCurrent: function progressCurrent(state, getters) {
+      return 0; //TODO
     }
   },
   actions: {
@@ -54182,14 +54387,14 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
         commit('SET_SITE', site);
         commit('SET_ANSWER_TYPES', __WEBPACK_IMPORTED_MODULE_4__constants__["a" /* ANSWER_TYPES */]);
         commit('SET_QUESTION_TYPES', __WEBPACK_IMPORTED_MODULE_4__constants__["b" /* QUESTION_TYPES */]);
-        dispatch('getServices');
-        commit('SET_LOADING_STATE', false);
+        dispatch('getServices'); // commit('SET_LOADING_STATE', false);
       });
     },
     getServices: function getServices(_ref3) {
       var commit = _ref3.commit,
+          dispatch = _ref3.dispatch,
           state = _ref3.state;
-      commit('SET_LOADING_STATE', true);
+      //commit('SET_LOADING_STATE', true);
       __WEBPACK_IMPORTED_MODULE_3_axios___default.a.get('/services/' + state.site.uuid).then(
       /*#__PURE__*/
       function () {
@@ -54215,7 +54420,14 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
         };
       }()).then(function (services) {
         commit('SET_SERVICES', services);
-        commit('SET_LOADING_STATE', false);
+
+        if (services.length == 1) {
+          commit('SET_SELECTED_SERVICE', services[0].uuid);
+          dispatch('getQuiz');
+        } else {
+          commit('SET_LOADING_STATE', false);
+        } //commit('SET_LOADING_STATE', false);
+
       });
     },
     getQuiz: function getQuiz(_ref5) {
@@ -54364,14 +54576,14 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
 }));
 
 /***/ }),
-/* 64 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(65);
+module.exports = __webpack_require__(68);
 
 
 /***/ }),
-/* 65 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -54398,7 +54610,7 @@ var oldRuntime = hadRuntime && g.regeneratorRuntime;
 // Force reevalutation of runtime.js.
 g.regeneratorRuntime = undefined;
 
-module.exports = __webpack_require__(66);
+module.exports = __webpack_require__(69);
 
 if (hadRuntime) {
   // Restore the original runtime.
@@ -54414,7 +54626,7 @@ if (hadRuntime) {
 
 
 /***/ }),
-/* 66 */
+/* 69 */
 /***/ (function(module, exports) {
 
 /**
@@ -55141,7 +55353,7 @@ if (hadRuntime) {
 
 
 /***/ }),
-/* 67 */
+/* 70 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -56086,7 +56298,7 @@ var index_esm = {
 
 
 /***/ }),
-/* 68 */
+/* 71 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -56104,7 +56316,7 @@ var QUESTION_TYPES = {
 };
 
 /***/ }),
-/* 69 */
+/* 72 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

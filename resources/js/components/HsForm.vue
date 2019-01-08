@@ -9,6 +9,7 @@
                 <div class="card-header hs-card-header">
                     <span class="hs-card-title">{{title}}</span>
                 </div>
+                <hs-progress></hs-progress>
                 <div class="card-body hs-card-body">
                     <hs-question></hs-question>
                 </div>
@@ -26,6 +27,7 @@
 <script>
 import hsServicesField from './HsServicesField';
 import hsQuestion from './HsQuestion';
+import hsProgress from './form_controls/HsProgress';
 
 export default {
     props: {
@@ -34,7 +36,8 @@ export default {
     },
     components: {
         'hs-services-field': hsServicesField,
-        'hs-question': hsQuestion
+        'hs-question': hsQuestion,
+        'hs-progress': hsProgress
     },
     computed: {
         isLoading() {

@@ -26,8 +26,12 @@ export default new Vuex.Store({
             }
         },
         question: (state) => (uuid) => {
-            if (state.quiz.questions.length > 0) {
-                return state.quiz.questions.find(question => question.uuid === uuid);
+            if (state.quiz.questions != 'undefined') {
+                if (state.quiz.questions.length > 0) {
+                    return state.quiz.questions.find(question => question.uuid === uuid);
+                } else {
+                    return {}
+                }
             } else {
                 return {}
             }
@@ -35,7 +39,7 @@ export default new Vuex.Store({
         answers: (state) => {
             if (typeof state.currentQuestion.answers !== 'undefined') {
                 return state.currentQuestion.answers.sort((a, b) => {
-                    return a.answer_order > b.answer_order;
+                    return a.answer_order - b.answer_order;
                 });
             } else {
                 return false
@@ -80,6 +84,12 @@ export default new Vuex.Store({
         },
         prevQuestion: (state) => {
             return state.answeredQuestions.slice(-1)[0];
+        },
+        progressMax: (state) => {
+            return 0;//(state.quiz.questions != 'undefined') ? state.quiz.questions.length : 0;
+        },
+        progressCurrent: (state, getters) => {
+            return 0; //TODO
         }
     },
     actions: {
@@ -93,17 +103,23 @@ export default new Vuex.Store({
                     commit('SET_ANSWER_TYPES', ANSWER_TYPES);
                     commit('SET_QUESTION_TYPES', QUESTION_TYPES);
                     dispatch('getServices');
-                    commit('SET_LOADING_STATE', false);
+                   // commit('SET_LOADING_STATE', false);
                 });
         },
-        getServices({commit, state}) {
-            commit('SET_LOADING_STATE', true);
+        getServices({commit, dispatch, state}) {
+            //commit('SET_LOADING_STATE', true);
             Axios
                 .get('/services/'+state.site.uuid)
                 .then(async r => r.data.data)
                 .then(services => {
                     commit('SET_SERVICES', services);
-                    commit('SET_LOADING_STATE', false);
+                    if (services.length == 1) {
+                        commit('SET_SELECTED_SERVICE', services[0].uuid);
+                        dispatch('getQuiz');
+                    } else {
+                        commit('SET_LOADING_STATE', false);
+                    }
+                    //commit('SET_LOADING_STATE', false);
                 });
         },
         getQuiz({commit, dispatch, state}) {

@@ -1,9 +1,10 @@
 <template>
     <div v-if="showMe">
-        <div class="custom-control custom-radio hs-input">
-            <input type="radio" :id="answer.uuid" name="answerRadio" class="custom-control-input hs-input-radio" :value="answer.uuid" v-model="selectAnswer">
-            <label class="custom-control-label hs-label" :for="answer.uuid">{{answer.answer}}</label>
-        </div>
+            <div class="custom-control custom-radio hs-input">
+                <input type="radio" :id="answer.uuid" name="answerRadio" class="custom-control-input hs-input-radio" :value="answer.uuid" v-model="selectAnswer">
+                <label class="custom-control-label hs-label" :for="answer.uuid">{{answer.answer}}</label>
+            </div>
+        </transition>
     </div>
 </template>
 
