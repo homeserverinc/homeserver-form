@@ -1,17 +1,22 @@
 <template>
     <div>
-        <hs-services-field></hs-services-field>
-        <div class="card hs-card">
-            <div class="card-header hs-card-header">
-                <span class="hs-card-title">{{title}}</span>
-            </div>
-            <div class="card-body hs-card-body">
-                <hs-question></hs-question>
-            </div>
-            <div class="card-footer hs-card-footer">
-                <div class="float-right">
-                    <button class="btn hs-btn-prev">Previous</button>
-                    <button class="btn hs-btn-next" @click="nextQuestion">Next</button>
+        <div class="alert alert-success" v-if="isLoading">
+            <i class="fas fa-spinner fa-spin"></i>  Loading...
+        </div>
+        <div v-else>
+            <hs-services-field></hs-services-field>
+            <div class="card hs-card">
+                <div class="card-header hs-card-header">
+                    <span class="hs-card-title">{{title}}</span>
+                </div>
+                <div class="card-body hs-card-body">
+                    <hs-question></hs-question>
+                </div>
+                <div class="card-footer hs-card-footer">
+                    <div class="float-right">
+                        <button class="btn hs-btn-prev hs-btn-prev" @click="previousQuestion">Previous</button>
+                        <button class="btn hs-btn-next hs-btn-next" @click="nextQuestion">Next</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -31,11 +36,19 @@ export default {
         'hs-services-field': hsServicesField,
         'hs-question': hsQuestion
     },
+    computed: {
+        isLoading() {
+            return this.$store.state.isLoading;
+        }
+    },
     methods: {
         nextQuestion() {
             if (this.validateAnswer()) {
-                /* return this.$store.dispatch('nextQuestion'); */
+                return this.$store.dispatch('goToNextQuestion');
             }
+        },
+        previousQuestion() {
+            return this.$store.dispatch('goToPrevQuestion');
         },
         validateAnswer() {
             return this.$store.getters.questionAnswered;

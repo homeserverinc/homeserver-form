@@ -53111,6 +53111,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -53122,11 +53127,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     'hs-services-field': __WEBPACK_IMPORTED_MODULE_0__HsServicesField___default.a,
     'hs-question': __WEBPACK_IMPORTED_MODULE_1__HsQuestion___default.a
   },
+  computed: {
+    isLoading: function isLoading() {
+      return this.$store.state.isLoading;
+    }
+  },
   methods: {
     nextQuestion: function nextQuestion() {
       if (this.validateAnswer()) {
-        /* return this.$store.dispatch('nextQuestion'); */
+        return this.$store.dispatch('goToNextQuestion');
       }
+    },
+    previousQuestion: function previousQuestion() {
+      return this.$store.dispatch('goToPrevQuestion');
     },
     validateAnswer: function validateAnswer() {
       return this.$store.getters.questionAnswered;
@@ -53226,10 +53239,13 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "form-group" }, [
+  return _c("div", { staticClass: "form-group hs-select-container" }, [
     _c(
       "label",
-      { staticClass: "form-control-label", attrs: { for: "selectService" } },
+      {
+        staticClass: "form-control-label hs-label",
+        attrs: { for: "selectService" }
+      },
       [_vm._v("What service do you need?")]
     ),
     _vm._v(" "),
@@ -53245,7 +53261,7 @@ var render = function() {
           }
         ],
         ref: "selectService",
-        staticClass: "form-control selectpicker",
+        staticClass: "form-control selectpicker hs-input-select",
         attrs: {
           "data-style": "btn-secondary",
           "data-live-search": "true",
@@ -53364,6 +53380,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -53371,8 +53389,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   },
   computed: {
     question: function question() {
-      //console.log(this.$store.state.currentQuestion);
       return this.$store.state.currentQuestion;
+    },
+    answers: function answers() {
+      return this.$store.getters.answers;
     }
   }
 });
@@ -53531,18 +53551,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       return this.$store.getters.answer(this.uuid);
     },
     showMe: function showMe() {
-      /* console.log('showMe - text');
-      console.log(this.answer);
-      console.log(this.$store.state.answerTypes);
-      console.log(this.$store.getters.answerIsSelected(this.uuid)); */
-      return (this.answer.answer_type_uuid == this.$store.state.answerTypes.SINGLE_CHOICE_TEXT || this.answer.answer_type_uuid == this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT) && this.$store.getters.answerIsSelected(this.uuid);
+      var answersSelecteds = this.$store.getters.answerIsSelected(this.uuid);
+      return (this.answer.answer_type_uuid == this.$store.state.answerTypes.SINGLE_CHOICE_TEXT || this.answer.answer_type_uuid == this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT) && answersSelecteds.uuid == this.uuid;
+    },
+    isSingleChoice: function isSingleChoice() {
+      return this.answer.answer_type_uuid == this.$store.state.answerTypes.SINGLE_CHOICE_TEXT;
     },
     customText: {
       get: function get() {
         return this.$store.state.currentQuestion.customText;
       },
       set: function set(value) {
-        this.$store.dispatch('setRadioCustomText', value);
+        this.$store.dispatch('setCustomText', value);
       }
     }
   }
@@ -53561,8 +53581,25 @@ var render = function() {
         _c("div", { staticStyle: { "margin-bottom": "1rem" } }),
         _vm._v(" "),
         _c("textarea", {
-          staticClass: "form-control",
-          attrs: { cols: "30", rows: "5" }
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.customText,
+              expression: "customText"
+            }
+          ],
+          staticClass: "form-control hs-input-text",
+          attrs: { cols: "30", rows: "5" },
+          domProps: { value: _vm.customText },
+          on: {
+            input: function($event) {
+              if ($event.target.composing) {
+                return
+              }
+              _vm.customText = $event.target.value
+            }
+          }
         })
       ])
     : _vm._e()
@@ -53646,10 +53683,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   computed: {
     selectAnswer: {
       get: function get() {
-        return this.$store.state.currentQuestion.selecte_answers;
+        return this.$store.getters.answerIsSelected(this.uuid).uuid;
       },
       set: function set(value) {
-        this.$store.dispatch('setSelectedRadio', this.uuid);
+        this.$store.dispatch('setSelectedAnswer', {
+          'uuid': this.uuid
+        });
       }
     },
     answer: function answer() {
@@ -53671,7 +53710,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _vm.showMe
     ? _c("div", [
-        _c("div", { staticClass: "custom-control custom-radio" }, [
+        _c("div", { staticClass: "custom-control custom-radio hs-input" }, [
           _c("input", {
             directives: [
               {
@@ -53681,7 +53720,7 @@ var render = function() {
                 expression: "selectAnswer"
               }
             ],
-            staticClass: "custom-control-input",
+            staticClass: "custom-control-input hs-input-radio",
             attrs: { type: "radio", id: _vm.answer.uuid, name: "answerRadio" },
             domProps: {
               value: _vm.answer.uuid,
@@ -53697,7 +53736,7 @@ var render = function() {
           _c(
             "label",
             {
-              staticClass: "custom-control-label",
+              staticClass: "custom-control-label hs-label",
               attrs: { for: _vm.answer.uuid }
             },
             [_vm._v(_vm._s(_vm.answer.answer))]
@@ -53778,13 +53817,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    parent: Object
+    uuid: String
+  },
+  methods: {
+    selectAnswer: function selectAnswer(e) {
+      this.$store.dispatch('selectCheckboxes', e.target);
+    }
   },
   computed: {
+    checkedAnswer: function checkedAnswer() {
+      var _this = this;
+
+      if (Array.isArray(this.$store.state.currentQuestion.selected_answers)) {
+        var x = this.$store.state.currentQuestion.selected_answers.find(function (a) {
+          return a.uuid === _this.uuid;
+        });
+        return x ? x.uuid : false;
+      }
+    },
+    answer: function answer() {
+      return this.$store.getters.answer(this.uuid);
+    },
+
+    /*         answers() {
+                return this.$store.state.currentQuestion.selected_answers;
+            }, */
     showMe: function showMe() {
-      return this.parent.answer.answer_type_uuid === this.$store.state.answerTypes.MULTIPLE_CHOICE || this.parent.answer.answer_type_uuid === this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT;
+      return this.answer.answer_type_uuid === this.$store.state.answerTypes.MULTIPLE_CHOICE || this.answer.answer_type_uuid === this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT;
     }
   }
 });
@@ -53799,19 +53864,21 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _vm.showMe
     ? _c("div", [
-        _c("div", { staticClass: "custom-control custom-checkbox" }, [
+        _c("div", { staticClass: "custom-control custom-checkbox hs-input" }, [
           _c("input", {
-            staticClass: "custom-control-input",
-            attrs: { type: "checkbox", id: _vm.parent.answer.uuid }
+            staticClass: "custom-control-input hs-input-check",
+            attrs: { type: "checkbox", id: _vm.answer.uuid },
+            domProps: { value: _vm.answer.uuid, checked: _vm.checkedAnswer },
+            on: { change: _vm.selectAnswer }
           }),
           _vm._v(" "),
           _c(
             "label",
             {
-              staticClass: "custom-control-label",
-              attrs: { for: _vm.parent.answer.uuid }
+              staticClass: "custom-control-label hs-label",
+              attrs: { for: _vm.answer.uuid }
             },
-            [_vm._v(_vm._s(_vm.parent.answer.answer))]
+            [_vm._v(_vm._s(_vm.answer.answer))]
           )
         ])
       ])
@@ -53837,8 +53904,11 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
+    { staticClass: "hs-input-container" },
     [
       _c("hs-radio-input", { attrs: { uuid: _vm.uuid } }),
+      _vm._v(" "),
+      _c("hs-checkbox-input", { attrs: { uuid: _vm.uuid } }),
       _vm._v(" "),
       _c("hs-text-input", { attrs: { uuid: _vm.uuid } })
     ],
@@ -53865,17 +53935,19 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _vm.question
     ? _c("div", [
-        _c("h1", [_vm._v(_vm._s(_vm.question.question))]),
+        _c("div", { staticClass: "hs-question" }, [
+          _c("h1", [_vm._v(_vm._s(_vm.question.question))])
+        ]),
         _vm._v(" "),
         _c(
           "div",
-          { staticClass: "list-group" },
-          _vm._l(_vm.question.answers, function(answer, index) {
+          { staticClass: "list-group hs-answers" },
+          _vm._l(_vm.answers, function(answer, index) {
             return _c(
               "div",
               {
                 key: index,
-                staticClass: "list-group-item list-group-item-action"
+                staticClass: "list-group-item list-group-item-action hs-answer"
               },
               [_c("hs-form-input", { attrs: { uuid: answer.uuid } })],
               1
@@ -53903,45 +53975,57 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    [
-      _c("hs-services-field"),
-      _vm._v(" "),
-      _c("div", { staticClass: "card hs-card" }, [
-        _c("div", { staticClass: "card-header hs-card-header" }, [
-          _c("span", { staticClass: "hs-card-title" }, [
-            _vm._v(_vm._s(_vm.title))
-          ])
-        ]),
-        _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "card-body hs-card-body" },
-          [_c("hs-question")],
-          1
-        ),
-        _vm._v(" "),
-        _c("div", { staticClass: "card-footer hs-card-footer" }, [
-          _c("div", { staticClass: "float-right" }, [
-            _c("button", { staticClass: "btn hs-btn-prev" }, [
-              _vm._v("Previous")
-            ]),
-            _vm._v(" "),
-            _c(
-              "button",
-              {
-                staticClass: "btn hs-btn-next",
-                on: { click: _vm.nextQuestion }
-              },
-              [_vm._v("Next")]
-            )
-          ])
+  return _c("div", [
+    _vm.isLoading
+      ? _c("div", { staticClass: "alert alert-success" }, [
+          _c("i", { staticClass: "fas fa-spinner fa-spin" }),
+          _vm._v("  Loading...\n    ")
         ])
-      ])
-    ],
-    1
-  )
+      : _c(
+          "div",
+          [
+            _c("hs-services-field"),
+            _vm._v(" "),
+            _c("div", { staticClass: "card hs-card" }, [
+              _c("div", { staticClass: "card-header hs-card-header" }, [
+                _c("span", { staticClass: "hs-card-title" }, [
+                  _vm._v(_vm._s(_vm.title))
+                ])
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "card-body hs-card-body" },
+                [_c("hs-question")],
+                1
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-footer hs-card-footer" }, [
+                _c("div", { staticClass: "float-right" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn hs-btn-prev hs-btn-prev",
+                      on: { click: _vm.previousQuestion }
+                    },
+                    [_vm._v("Previous")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn hs-btn-next hs-btn-next",
+                      on: { click: _vm.nextQuestion }
+                    },
+                    [_vm._v("Next")]
+                  )
+                ])
+              ])
+            ])
+          ],
+          1
+        )
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
@@ -53986,9 +54070,17 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
     service: {},
     site: {},
     answerTypes: {},
-    questionTypes: {}
+    questionTypes: {},
+    isLoading: false
   },
   getters: {
+    singleChoiceQuestion: function singleChoiceQuestion(state) {
+      if (typeof state.currentQuestion.question_type != 'undefined') {
+        return state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE;
+      } else {
+        return false;
+      }
+    },
     question: function question(state) {
       return function (uuid) {
         if (state.quiz.questions.length > 0) {
@@ -54000,34 +54092,69 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
         }
       };
     },
+    answers: function answers(state) {
+      if (typeof state.currentQuestion.answers !== 'undefined') {
+        return state.currentQuestion.answers.sort(function (a, b) {
+          return a.answer_order > b.answer_order;
+        });
+      } else {
+        return false;
+      }
+    },
     answer: function answer(state) {
       return function (uuid) {
-        if (state.currentQuestion.answers.length > 0) {
+        if (typeof state.currentQuestion.answers !== 'undefined') {
           return state.currentQuestion.answers.find(function (answer) {
             return answer.uuid === uuid;
           });
         } else {
-          return {};
+          return false;
         }
       };
     },
-    answerIsSelected: function answerIsSelected(state) {
+    answerIsSelected: function answerIsSelected(state, getters) {
       return function (uuid) {
-        return state.currentQuestion.selected_answers === uuid;
+        if (getters.singleChoiceQuestion) {
+          return state.currentQuestion.selected_answers;
+        } else {
+          if (Array.isArray(state.currentQuestion.selected_answers)) {
+            return state.currentQuestion.selected_answers.find(function (answer) {
+              return answer.uuid === uuid;
+            });
+          } else {
+            return false;
+          }
+        }
       };
     },
     questionAnswered: function questionAnswered(state) {
-      return state.currentQuestion.selected_answers;
+      if (Array.isArray(state.currentQuestion.selected_answers)) {
+        console.log(state.currentQuestion.selected_answers);
+        return state.currentQuestion.selected_answers.length > 0 ? true : false;
+      } else {
+        return state.currentQuestion.selected_answers ? state.currentQuestion.selected_answers.hasOwnProperty('uuid') : false;
+      }
     },
     nextQuestion: function nextQuestion(state, getters) {
-      var answer = getters.answer(state.currentQuestion.selected_answers);
-      return getters.question(answer.next_question_uuid);
+      if (typeof state.currentQuestion.question_type != 'undefined') {
+        if (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE) {
+          var answer = getters.answer(state.currentQuestion.selected_answers.uuid);
+          return answer ? getters.question(answer.next_question_uuid) : false;
+        } else {
+          var nq = state.currentQuestion.next_question_uuid;
+          return nq ? getters.question(nq) : false;
+        }
+      }
+    },
+    prevQuestion: function prevQuestion(state) {
+      return state.answeredQuestions.slice(-1)[0];
     }
   },
   actions: {
     getSite: function getSite(_ref, siteUuid) {
       var commit = _ref.commit,
           dispatch = _ref.dispatch;
+      commit('SET_LOADING_STATE', true);
       __WEBPACK_IMPORTED_MODULE_3_axios___default.a.get('/site/' + siteUuid).then(
       /*#__PURE__*/
       function () {
@@ -54056,11 +54183,13 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
         commit('SET_ANSWER_TYPES', __WEBPACK_IMPORTED_MODULE_4__constants__["a" /* ANSWER_TYPES */]);
         commit('SET_QUESTION_TYPES', __WEBPACK_IMPORTED_MODULE_4__constants__["b" /* QUESTION_TYPES */]);
         dispatch('getServices');
+        commit('SET_LOADING_STATE', false);
       });
     },
     getServices: function getServices(_ref3) {
       var commit = _ref3.commit,
           state = _ref3.state;
+      commit('SET_LOADING_STATE', true);
       __WEBPACK_IMPORTED_MODULE_3_axios___default.a.get('/services/' + state.site.uuid).then(
       /*#__PURE__*/
       function () {
@@ -54086,12 +54215,14 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
         };
       }()).then(function (services) {
         commit('SET_SERVICES', services);
+        commit('SET_LOADING_STATE', false);
       });
     },
     getQuiz: function getQuiz(_ref5) {
       var commit = _ref5.commit,
           dispatch = _ref5.dispatch,
           state = _ref5.state;
+      commit('SET_LOADING_STATE', true);
       __WEBPACK_IMPORTED_MODULE_3_axios___default.a.get('/quiz/' + state.service).then(
       /*#__PURE__*/
       function () {
@@ -54116,9 +54247,9 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
           return _ref6.apply(this, arguments);
         };
       }()).then(function (quiz) {
-        console.log(quiz);
         commit('SET_QUIZ', quiz);
         dispatch('getQuestion');
+        commit('SET_LOADING_STATE', false);
       });
     },
     getQuestion: function getQuestion(_ref7) {
@@ -54139,25 +54270,49 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
       commit('SET_SELECTED_SERVICE', service);
       dispatch('getQuiz');
     },
-    setSelectedRadio: function setSelectedRadio(_ref9, uuid) {
+    setSelectedAnswer: function setSelectedAnswer(_ref9, answer) {
       var commit = _ref9.commit;
-      commit('SET_SELECTED_ANSWER_RADIO', uuid);
+      commit('SET_SELECTED_ANSWER', answer);
     },
-    setRadioCustomText: function setRadioCustomText(_ref10, customText) {
-      var commit = _ref10.commit;
-      commit('SET_RADIO_CUSTOM_TEXT', customText);
-    },
-    nextQuestion: function nextQuestion(_ref11) {
-      var commit = _ref11.commit,
-          state = _ref11.state,
-          getters = _ref11.getters;
-      //console.log(state.currentQuestion.selected_answers);
-      commit('ADD_ANSWERED_QUESTION'); //console.log(getters.question(state.currentQuestion.selected_answers));
+    selectCheckboxes: function selectCheckboxes(_ref10, answer) {
+      var commit = _ref10.commit,
+          state = _ref10.state;
 
+      if (!Array.isArray(state.currentQuestion.selected_answers)) {
+        commit('INIT_SELECTED_ANSWERS');
+      }
+
+      if (answer.checked) {
+        commit('ADD_CHECKED_ANSWER', {
+          uuid: answer.value
+        });
+      } else {
+        commit('DEL_CHECKED_ANSWER', answer.value);
+      }
+    },
+    setCustomText: function setCustomText(_ref11, customText) {
+      var commit = _ref11.commit;
+      commit('SET_CUSTOM_TEXT', customText);
+    },
+    goToNextQuestion: function goToNextQuestion(_ref12) {
+      var commit = _ref12.commit,
+          getters = _ref12.getters;
+      commit('ADD_ANSWERED_QUESTION');
       commit('SET_CURRENT_QUESTION', getters.nextQuestion);
+    },
+    goToPrevQuestion: function goToPrevQuestion(_ref13) {
+      var commit = _ref13.commit,
+          getters = _ref13.getters;
+      var prevq = getters.prevQuestion;
+      commit('SET_CURRENT_QUESTION', getters.question(prevq.uuid));
+      commit('SET_SELECTED_ANSWER', prevq.selected_answers);
+      commit('POP_ANSWERED_QUESTION');
     }
   },
   mutations: {
+    CHECK_ANSWER: function CHECK_ANSWER(state, answer) {
+      state.checkedAnswers = answer;
+    },
     SET_ANSWER_TYPES: function SET_ANSWER_TYPES(state, answerTypes) {
       state.answerTypes = answerTypes;
     },
@@ -54179,14 +54334,31 @@ __WEBPACK_IMPORTED_MODULE_1_vue___default.a.use(__WEBPACK_IMPORTED_MODULE_2_vuex
     SET_CURRENT_QUESTION: function SET_CURRENT_QUESTION(state, question) {
       state.currentQuestion = question;
     },
-    SET_SELECTED_ANSWER_RADIO: function SET_SELECTED_ANSWER_RADIO(state, uuid) {
-      state.currentQuestion.selected_answers = uuid;
+    SET_SELECTED_ANSWER: function SET_SELECTED_ANSWER(state, answer) {
+      state.currentQuestion.selected_answers = answer;
     },
-    SET_RADIO_CUSTOM_TEXT: function SET_RADIO_CUSTOM_TEXT(state, customText) {
+    SET_CUSTOM_TEXT: function SET_CUSTOM_TEXT(state, customText) {
       state.currentQuestion.customText = customText;
     },
     ADD_ANSWERED_QUESTION: function ADD_ANSWERED_QUESTION(state) {
       state.answeredQuestions.push(state.currentQuestion);
+    },
+    INIT_SELECTED_ANSWERS: function INIT_SELECTED_ANSWERS(state) {
+      state.currentQuestion.selected_answers = [];
+    },
+    ADD_CHECKED_ANSWER: function ADD_CHECKED_ANSWER(state, answer) {
+      state.currentQuestion.selected_answers.push(answer);
+    },
+    DEL_CHECKED_ANSWER: function DEL_CHECKED_ANSWER(state, answer) {
+      state.currentQuestion.selected_answers = state.currentQuestion.selected_answers.filter(function (a) {
+        return a.uuid != answer;
+      });
+    },
+    POP_ANSWERED_QUESTION: function POP_ANSWERED_QUESTION(state) {
+      state.answeredQuestions.pop();
+    },
+    SET_LOADING_STATE: function SET_LOADING_STATE(state, isLoading) {
+      state.isLoading = isLoading;
     }
   }
 }));

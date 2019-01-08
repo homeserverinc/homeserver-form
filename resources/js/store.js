@@ -5,7 +5,6 @@ import { QUESTION_TYPES, ANSWER_TYPES } from './constants';
 
 Vue.use(Vuex);
 
-
 export default new Vuex.Store({
     state: {
         quiz: {},
@@ -15,9 +14,17 @@ export default new Vuex.Store({
         service: {},
         site: {},
         answerTypes: {},
-        questionTypes: {}
+        questionTypes: {},
+        isLoading: false
     },
     getters: {
+        singleChoiceQuestion: (state) => {
+            if (typeof state.currentQuestion.question_type != 'undefined') {
+                return (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE);
+            } else {
+                return false;
+            }
+        },
         question: (state) => (uuid) => {
             if (state.quiz.questions.length > 0) {
                 return state.quiz.questions.find(question => question.uuid === uuid);
@@ -25,26 +32,59 @@ export default new Vuex.Store({
                 return {}
             }
         },
-        answer: (state) => (uuid) => {
-            if (state.currentQuestion.answers.length > 0) {
-                return state.currentQuestion.answers.find(answer => answer.uuid === uuid);
+        answers: (state) => {
+            if (typeof state.currentQuestion.answers !== 'undefined') {
+                return state.currentQuestion.answers.sort((a, b) => {
+                    return a.answer_order > b.answer_order;
+                });
             } else {
-                return {}
+                return false
             }
         },
-        answerIsSelected: (state) => (uuid) => {
-            return (state.currentQuestion.selected_answers === uuid);
+        answer: (state) => (uuid) => {
+            if (typeof state.currentQuestion.answers !== 'undefined') {
+                return state.currentQuestion.answers.find(answer => answer.uuid === uuid);
+            } else {
+                return false
+            }
+        },
+        answerIsSelected: (state, getters) => (uuid) => {
+            if (getters.singleChoiceQuestion) { 
+                    return state.currentQuestion.selected_answers;
+            } else {
+                if (Array.isArray(state.currentQuestion.selected_answers)) {
+                        return state.currentQuestion.selected_answers.find(answer => answer.uuid === uuid);
+                } else {
+                    return false;
+                }
+            }
         },
         questionAnswered: (state) => {
-            return (state.currentQuestion.selected_answers);
+            if (Array.isArray(state.currentQuestion.selected_answers)) {
+                console.log(state.currentQuestion.selected_answers);
+                return (state.currentQuestion.selected_answers.length > 0) ? true : false;
+            } else {
+                return (state.currentQuestion.selected_answers) ? state.currentQuestion.selected_answers.hasOwnProperty('uuid') : false; 
+            }
         },
         nextQuestion: (state, getters) => {
-            let answer = getters.answer(state.currentQuestion.selected_answers);
-            return getters.question(answer.next_question_uuid);
+            if (typeof state.currentQuestion.question_type != 'undefined') {
+                if (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE) {
+                    let answer = getters.answer(state.currentQuestion.selected_answers.uuid);
+                    return (answer) ? getters.question(answer.next_question_uuid) : false;
+                } else {
+                    let nq = state.currentQuestion.next_question_uuid
+                    return  (nq) ? getters.question(nq) : false;
+                }
+            }
+        },
+        prevQuestion: (state) => {
+            return state.answeredQuestions.slice(-1)[0];
         }
     },
     actions: {
         getSite({ commit, dispatch }, siteUuid) {
+            commit('SET_LOADING_STATE', true);
             Axios
                 .get('/site/'+siteUuid)
                 .then(async r => r.data.data)
@@ -53,24 +93,28 @@ export default new Vuex.Store({
                     commit('SET_ANSWER_TYPES', ANSWER_TYPES);
                     commit('SET_QUESTION_TYPES', QUESTION_TYPES);
                     dispatch('getServices');
+                    commit('SET_LOADING_STATE', false);
                 });
         },
         getServices({commit, state}) {
+            commit('SET_LOADING_STATE', true);
             Axios
                 .get('/services/'+state.site.uuid)
                 .then(async r => r.data.data)
                 .then(services => {
                     commit('SET_SERVICES', services);
+                    commit('SET_LOADING_STATE', false);
                 });
         },
         getQuiz({commit, dispatch, state}) {
+            commit('SET_LOADING_STATE', true);
             Axios
                 .get('/quiz/'+state.service)
                 .then(async r => r.data.data)
                 .then(quiz => {
-                    console.log(quiz);
                     commit('SET_QUIZ', quiz);
                     dispatch('getQuestion');
+                    commit('SET_LOADING_STATE', false);
                 });
         },
         getQuestion({commit, state, getters}, uuid = null) {
@@ -84,23 +128,37 @@ export default new Vuex.Store({
             commit('SET_SELECTED_SERVICE', service);
             dispatch('getQuiz');
         },
-        setSelectedRadio({commit}, uuid) {
-            commit('SET_SELECTED_ANSWER_RADIO', uuid);
+        setSelectedAnswer({commit}, answer) {
+            commit('SET_SELECTED_ANSWER', answer);
         },
-        setRadioCustomText({commit}, customText) {
-            commit('SET_RADIO_CUSTOM_TEXT', customText);
+        selectCheckboxes({commit, state}, answer) {
+            if (!Array.isArray(state.currentQuestion.selected_answers)) {
+                commit('INIT_SELECTED_ANSWERS')
+            }
+            if (answer.checked) {
+                commit('ADD_CHECKED_ANSWER', {uuid: answer.value});
+            } else {
+                commit('DEL_CHECKED_ANSWER', answer.value);
+            }
         },
-        nextQuestion({commit, state, getters}) {
-            //console.log(state.currentQuestion.selected_answers);
-
+        setCustomText({commit}, customText) {
+            commit('SET_CUSTOM_TEXT', customText);
+        },
+        goToNextQuestion({commit, getters}) {
             commit('ADD_ANSWERED_QUESTION');
-
-            //console.log(getters.question(state.currentQuestion.selected_answers));
-
             commit('SET_CURRENT_QUESTION', getters.nextQuestion);
+        },
+        goToPrevQuestion({commit, getters}) {
+            let prevq = getters.prevQuestion;
+            commit('SET_CURRENT_QUESTION', getters.question(prevq.uuid));
+            commit('SET_SELECTED_ANSWER', prevq.selected_answers);
+            commit('POP_ANSWERED_QUESTION');
         }
     },
     mutations: {
+        CHECK_ANSWER(state, answer) {
+            state.checkedAnswers = answer;
+        },
         SET_ANSWER_TYPES(state, answerTypes) {
             state.answerTypes = answerTypes;
         },
@@ -122,14 +180,29 @@ export default new Vuex.Store({
         SET_CURRENT_QUESTION(state, question) {
             state.currentQuestion = question;
         },
-        SET_SELECTED_ANSWER_RADIO(state, uuid) {
-            state.currentQuestion.selected_answers = uuid;
+        SET_SELECTED_ANSWER(state, answer) {
+            state.currentQuestion.selected_answers = answer;
         },
-        SET_RADIO_CUSTOM_TEXT(state, customText) {
+        SET_CUSTOM_TEXT(state, customText) {
             state.currentQuestion.customText = customText;
         },
         ADD_ANSWERED_QUESTION(state) {
             state.answeredQuestions.push(state.currentQuestion);
+        },
+        INIT_SELECTED_ANSWERS(state) {
+            state.currentQuestion.selected_answers = [];
+        },
+        ADD_CHECKED_ANSWER(state, answer) {
+            state.currentQuestion.selected_answers.push(answer);
+        },
+        DEL_CHECKED_ANSWER(state, answer) {
+            state.currentQuestion.selected_answers = state.currentQuestion.selected_answers.filter(a => a.uuid != answer);
+        },
+        POP_ANSWERED_QUESTION(state) {
+            state.answeredQuestions.pop();
+        },
+        SET_LOADING_STATE(state, isLoading) {
+            state.isLoading = isLoading;
         }
     }
 });

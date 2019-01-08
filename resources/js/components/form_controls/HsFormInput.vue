@@ -1,7 +1,7 @@
 <template>
-    <div>
+    <div class="hs-input-container">
         <hs-radio-input :uuid="uuid"></hs-radio-input>
-        <!-- <hs-checkbox-input :answerUuid="answer"></hs-checkbox-input> -->
+        <hs-checkbox-input :uuid="uuid"></hs-checkbox-input>
         <hs-text-input :uuid="uuid"></hs-text-input>
     </div>
 </template>

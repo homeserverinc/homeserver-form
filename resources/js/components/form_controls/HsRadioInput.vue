@@ -1,8 +1,8 @@
 <template>
     <div v-if="showMe">
-        <div class="custom-control custom-radio">
-            <input type="radio" :id="answer.uuid" name="answerRadio" class="custom-control-input" :value="answer.uuid" v-model="selectAnswer">
-            <label class="custom-control-label" :for="answer.uuid">{{answer.answer}}</label>
+        <div class="custom-control custom-radio hs-input">
+            <input type="radio" :id="answer.uuid" name="answerRadio" class="custom-control-input hs-input-radio" :value="answer.uuid" v-model="selectAnswer">
+            <label class="custom-control-label hs-label" :for="answer.uuid">{{answer.answer}}</label>
         </div>
     </div>
 </template>
@@ -16,10 +16,10 @@ export default {
     computed: {
         selectAnswer: {
             get() {
-                return this.$store.state.currentQuestion.selecte_answers
+                return this.$store.getters.answerIsSelected(this.uuid).uuid;
             },
             set(value) {
-                this.$store.dispatch('setSelectedRadio', this.uuid);
+                this.$store.dispatch('setSelectedAnswer', { 'uuid': this.uuid });
             }
         },
         answer() {
