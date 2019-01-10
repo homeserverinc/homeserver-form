@@ -33,9 +33,6 @@ export default {
         answer() {
             return this.$store.getters.answer(this.uuid);
         },
-/*         answers() {
-            return this.$store.state.currentQuestion.selected_answers;
-        }, */
         showMe() {
             return (
                 (this.answer.answer_type_uuid === this.$store.state.answerTypes.MULTIPLE_CHOICE) ||

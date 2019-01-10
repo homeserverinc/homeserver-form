@@ -19,15 +19,23 @@ export default {
             return this.$store.getters.answer(this.uuid);
         },
         showMe() {
-            let answersSelecteds = this.$store.getters.answerIsSelected(this.uuid);
-            return (
-                (
-                    (this.answer.answer_type_uuid == this.$store.state.answerTypes.SINGLE_CHOICE_TEXT) || 
-                    (this.answer.answer_type_uuid == this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT)
-                ) && (
-                    answersSelecteds.uuid == this.uuid
-                )
-            )
+            var answersSelecteds = this.$store.getters.answerIsSelected(this.uuid);
+            
+            if (answersSelecteds != undefined) {
+                switch (this.answer.answer_type_uuid) {
+                    case this.$store.state.answerTypes.SINGLE_CHOICE_TEXT:
+                        answersSelecteds.uuid == this.uuid;
+                        break;
+
+                    case this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT:
+                        return (answersSelecteds.uuid = this.uuid);
+                        break;
+                
+                    default:
+                        return false;
+                        break;
+                }
+            }
         },
         isSingleChoice() {
             return (this.answer.answer_type_uuid == this.$store.state.answerTypes.SINGLE_CHOICE_TEXT);

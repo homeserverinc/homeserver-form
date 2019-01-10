@@ -15,7 +15,9 @@ export default new Vuex.Store({
         site: {},
         answerTypes: {},
         questionTypes: {},
-        isLoading: false
+        isLoading: false,
+        showQuestionTitle: true,
+        finishedQuiz: false
     },
     getters: {
         singleChoiceQuestion: (state) => {
@@ -59,27 +61,28 @@ export default new Vuex.Store({
                 if (Array.isArray(state.currentQuestion.selected_answers)) {
                         return state.currentQuestion.selected_answers.find(answer => answer.uuid === uuid);
                 } else {
-                    return false;
+                    return undefined;
                 }
             }
         },
         questionAnswered: (state) => {
             if (Array.isArray(state.currentQuestion.selected_answers)) {
-                console.log(state.currentQuestion.selected_answers);
                 return (state.currentQuestion.selected_answers.length > 0) ? true : false;
             } else {
                 return (state.currentQuestion.selected_answers) ? state.currentQuestion.selected_answers.hasOwnProperty('uuid') : false; 
             }
         },
         nextQuestion: (state, getters) => {
-            if (typeof state.currentQuestion.question_type != 'undefined') {
+            if (state.currentQuestion.hasOwnProperty('question_type')) {
                 if (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE) {
                     let answer = getters.answer(state.currentQuestion.selected_answers.uuid);
-                    return (answer) ? getters.question(answer.next_question_uuid) : false;
+                    return (answer) ? getters.question(answer.next_question_uuid) : {};
                 } else {
                     let nq = state.currentQuestion.next_question_uuid
-                    return  (nq) ? getters.question(nq) : false;
+                    return  (nq) ? getters.question(nq) : {};
                 }
+            } else {
+                return {}
             }
         },
         prevQuestion: (state) => {
@@ -90,6 +93,9 @@ export default new Vuex.Store({
         },
         progressCurrent: (state, getters) => {
             return 0; //TODO
+        },
+        showPrevBtn: (state) => {
+            return (state.answeredQuestions.length > 0);
         }
     },
     actions: {
@@ -103,11 +109,12 @@ export default new Vuex.Store({
                     commit('SET_ANSWER_TYPES', ANSWER_TYPES);
                     commit('SET_QUESTION_TYPES', QUESTION_TYPES);
                     dispatch('getServices');
-                   // commit('SET_LOADING_STATE', false);
                 });
         },
         getServices({commit, dispatch, state}) {
-            //commit('SET_LOADING_STATE', true);
+            if (!state.isLoading) {
+                commit('SET_LOADING_STATE', true);
+            }
             Axios
                 .get('/services/'+state.site.uuid)
                 .then(async r => r.data.data)
@@ -119,7 +126,6 @@ export default new Vuex.Store({
                     } else {
                         commit('SET_LOADING_STATE', false);
                     }
-                    //commit('SET_LOADING_STATE', false);
                 });
         },
         getQuiz({commit, dispatch, state}) {
@@ -160,15 +166,32 @@ export default new Vuex.Store({
         setCustomText({commit}, customText) {
             commit('SET_CUSTOM_TEXT', customText);
         },
-        goToNextQuestion({commit, getters}) {
+        goToNextQuestion({commit, dispatch, getters}) {
+            commit('SET_QUESTION_TITLE_VISIBLE', false);
+            commit('SET_ANSWER_VISIBLE', false);
             commit('ADD_ANSWERED_QUESTION');
             commit('SET_CURRENT_QUESTION', getters.nextQuestion);
+            dispatch('makeQuestionVisible');
         },
-        goToPrevQuestion({commit, getters}) {
+        goToPrevQuestion({commit, state, dispatch, getters}) {
+            if (typeof state.currentQuestion != 'undefined') {
+                commit('SET_QUESTION_TITLE_VISIBLE', false);
+                commit('SET_ANSWER_VISIBLE', false);
+            }
             let prevq = getters.prevQuestion;
             commit('SET_CURRENT_QUESTION', getters.question(prevq.uuid));
             commit('SET_SELECTED_ANSWER', prevq.selected_answers);
             commit('POP_ANSWERED_QUESTION');
+            dispatch('makeQuestionVisible');
+        },
+        makeQuestionVisible({commit, state}) {
+            if (typeof state.currentQuestion != 'undefined') {
+                commit('SET_ANSWER_VISIBLE', true);
+                commit('SET_QUESTION_TITLE_VISIBLE', true);
+                commit('SET_FINISHED_QUIZ', false);
+            } else {
+                commit('SET_FINISHED_QUIZ', true);
+            }
         }
     },
     mutations: {
@@ -219,6 +242,26 @@ export default new Vuex.Store({
         },
         SET_LOADING_STATE(state, isLoading) {
             state.isLoading = isLoading;
+        },
+        SET_HIDE_COMPONENTS(state, component) {
+            state.hideComponents.push(component);
+        },
+        UNSET_HIDE_COMPONENTS(state) {
+            state.hideComponents = [];
+        },
+        SET_QUESTION_TITLE_VISIBLE(state, visible) {
+            state.showQuestionTitle = visible;
+        },
+        SET_ANSWER_VISIBLE(state, visible) {
+            state.currentQuestion.answers.forEach(answer => {
+                answer.visible = visible;  
+            });
+        },
+        CLEAR_CURRENT_QUESTION(state) {
+            state.currentQuestion = {};
+        },
+        SET_FINISHED_QUIZ(state, finish) {
+            state.finishedQuiz = finish;
         }
     }
 });
