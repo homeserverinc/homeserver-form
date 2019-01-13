@@ -3,6 +3,13 @@ import Vuex, { Store } from 'vuex';
 import Axios from 'axios';
 import { QUESTION_TYPES, ANSWER_TYPES } from './constants';
 
+//Notification default duration in milliseconds
+const defaultDuration = 8000;
+
+//Valid mutation names
+const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED';
+const NOTIFICATION_DISMISSED = 'NOTIFICATION_DISMISSED';
+
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -15,14 +22,19 @@ export default new Vuex.Store({
         site: {},
         answerTypes: {},
         questionTypes: {},
-        isLoading: false,
+        isLoading: true,
         showQuestionTitle: true,
-        finishedQuiz: false
+        finishedQuiz: false,
+        notifications: []
     },
     getters: {
         singleChoiceQuestion: (state) => {
-            if (typeof state.currentQuestion.question_type != 'undefined') {
-                return (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE);
+            if (state.currentQuestion !== undefined) {
+                if (typeof state.currentQuestion.question_type != 'undefined') {
+                    return (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE);
+                } else {
+                    return false;
+                }
             } else {
                 return false;
             }
@@ -39,12 +51,16 @@ export default new Vuex.Store({
             }
         },
         answers: (state) => {
-            if (typeof state.currentQuestion.answers !== 'undefined') {
-                return state.currentQuestion.answers.sort((a, b) => {
-                    return a.answer_order - b.answer_order;
-                });
+            if (state.currentQuestion !== undefined) {
+                if (typeof state.currentQuestion.answers !== 'undefined') {
+                    return state.currentQuestion.answers.sort((a, b) => {
+                        return a.answer_order - b.answer_order;
+                    });
+                } else {
+                    return false
+                }
             } else {
-                return false
+                return false;
             }
         },
         answer: (state) => (uuid) => {
@@ -66,20 +82,28 @@ export default new Vuex.Store({
             }
         },
         questionAnswered: (state) => {
-            if (Array.isArray(state.currentQuestion.selected_answers)) {
-                return (state.currentQuestion.selected_answers.length > 0) ? true : false;
+            if (state.currentQuestion !== undefined) {
+                if (Array.isArray(state.currentQuestion.selected_answers)) {
+                    return (state.currentQuestion.selected_answers.length > 0) ? true : false;
+                } else {
+                    return (state.currentQuestion.selected_answers) ? state.currentQuestion.selected_answers.hasOwnProperty('uuid') : false; 
+                }
             } else {
-                return (state.currentQuestion.selected_answers) ? state.currentQuestion.selected_answers.hasOwnProperty('uuid') : false; 
+                return false;
             }
         },
         nextQuestion: (state, getters) => {
-            if (state.currentQuestion.hasOwnProperty('question_type')) {
-                if (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE) {
-                    let answer = getters.answer(state.currentQuestion.selected_answers.uuid);
-                    return (answer) ? getters.question(answer.next_question_uuid) : {};
+            if (state.currentQuestion !== undefined) {
+                if (state.currentQuestion.hasOwnProperty('question_type')) {
+                    if (state.currentQuestion.question_type.uuid === state.questionTypes.SINGLE_CHOICE) {
+                        let answer = getters.answer(state.currentQuestion.selected_answers.uuid);
+                        return (answer) ? getters.question(answer.next_question_uuid) : {};
+                    } else {
+                        let nq = state.currentQuestion.next_question_uuid
+                        return  (nq) ? getters.question(nq) : {};
+                    }
                 } else {
-                    let nq = state.currentQuestion.next_question_uuid
-                    return  (nq) ? getters.question(nq) : {};
+                    return {}
                 }
             } else {
                 return {}
@@ -96,7 +120,8 @@ export default new Vuex.Store({
         },
         showPrevBtn: (state) => {
             return (state.answeredQuestions.length > 0);
-        }
+        },
+        notifications: (state) => state.notifications.map(n => n.Raw)
     },
     actions: {
         getSite({ commit, dispatch }, siteUuid) {
@@ -192,6 +217,30 @@ export default new Vuex.Store({
             } else {
                 commit('SET_FINISHED_QUIZ', true);
             }
+        },
+        addNotification({ commit }, notification) {
+            //Get notification duration or use default duration
+            let duration = notification.duration || defaultDuration
+    
+            notification.id = new Date().getTime();
+
+            //Create a timeout to dismiss notification
+            var timeOut = setTimeout(function () {
+                //On timeout mutate state to dismiss notification
+                commit(NOTIFICATION_DISMISSED, notification);
+            }, duration);
+    
+            //Mutate state to add new notification, we create a new object 
+            //for save original raw notification object and timeout reference
+            commit(NOTIFICATION_ADDED, {
+                Raw: notification,
+                TimeOut: timeOut
+            })
+        },
+        //Here we are using context object directly
+        dismissNotification(context, notification) {
+            //Just pass payload
+            context.commit(NOTIFICATION_DISMISSED, notification);
         }
     },
     mutations: {
@@ -223,7 +272,7 @@ export default new Vuex.Store({
             state.currentQuestion.selected_answers = answer;
         },
         SET_CUSTOM_TEXT(state, customText) {
-            state.currentQuestion.customText = customText;
+            state.currentQuestion.custom_answer = customText;
         },
         ADD_ANSWERED_QUESTION(state) {
             state.answeredQuestions.push(state.currentQuestion);
@@ -262,6 +311,20 @@ export default new Vuex.Store({
         },
         SET_FINISHED_QUIZ(state, finish) {
             state.finishedQuiz = finish;
+        },
+        //On mutations we receive current state and a payload
+        [NOTIFICATION_ADDED](state, notification) {
+            state.notifications.push(notification);
+        },
+        //remember, current state and payload
+        [NOTIFICATION_DISMISSED](state, rawNotification) {
+            var i = state.notifications.map(n => n.Raw).indexOf(rawNotification);
+            if (i == -1) {
+                return;
+            }
+        
+            clearTimeout(state.notifications[i].TimeOut);
+            state.notifications.splice(i, 1);
         }
     }
 });

@@ -42,7 +42,7 @@ export default {
         },
         customText: {
             get () {
-                return this.$store.state.currentQuestion.customText;
+                return this.$store.state.currentQuestion.custom_answer;
             },
             set (value) {
                 this.$store.dispatch('setCustomText', value);

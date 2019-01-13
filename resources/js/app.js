@@ -20,9 +20,6 @@ window.Vue = require('vue');
 
 //var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
-
-//console.log(csrf_token);
-
 import hsForm from './components/HsForm.vue';
 import store from './store';
 
