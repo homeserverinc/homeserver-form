@@ -19,10 +19,15 @@
                 <div class="card hs-card">
                     <div class="card-header hs-card-header">
                         <span class="hs-card-title">{{title}}</span>
+                        <span class="float-right alert alert-success hs-card-title-phone" v-if="phone">
+                            <i class="fas fa-phone"></i>
+                            {{ phone }}
+                        </span>
                     </div>
                     <hs-progress></hs-progress>
                     <div class="card-body hs-card-body">
                         <hs-question v-if="!finishedQuiz"></hs-question>
+                        <!-- <hs-personal-data></hs-personal-data> -->
                         <hs-quiz-review v-else></hs-quiz-review>
                     </div>
                     <div class="card-footer hs-card-footer">
@@ -44,6 +49,20 @@
 </template>
 
 <style>
+    
+    .hs-card-header {
+        padding: 0 !important;
+    }
+
+    .hs-card-title {
+        margin: 0.75rem 1.25rem !important;
+        position: absolute;
+    }
+
+    .hs-card-title-phone {
+        margin-bottom: 0 !important;
+    }
+
     .fade-leave-active,
     .fade-enter-active {
         transition: .8s ease;
@@ -78,6 +97,7 @@ import hsQuestion from './HsQuestion';
 import hsProgress from './form_controls/HsProgress';
 import hsQuizReview from './HsQuizReview';
 import hsNotifications from './HsNotifications';
+import hsPersonalData from './HsPersonalData';
 
 export default {
     props: {
@@ -89,7 +109,8 @@ export default {
         'hs-question': hsQuestion,
         'hs-progress': hsProgress,
         'hs-quiz-review': hsQuizReview,
-        'hs-notifications': hsNotifications
+        'hs-notifications': hsNotifications,
+        'hs-personal-data': hsPersonalData
     },
     computed: {
         isLoading() {
@@ -103,6 +124,9 @@ export default {
         },
         finishedQuiz() {
             return this.$store.state.finishedQuiz;
+        },
+        phone() {
+            return this.$store.state.site.phone.friendly_name;
         }
     },
     methods: {

@@ -18,4 +18,5 @@
 
     <script src="public/js/app.js"></script> 
 </body>
+<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAXEKDJ6apFhd92r8DaBoNuFru26-8aR_I&libraries=places"></script>
 </html>
