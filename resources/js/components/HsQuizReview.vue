@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="hs-quiz-review">
         <transition-group appear name="slide" mode="out-in">
         <div class="hs-question hs-title-overflow" v-for="q in questions" :key="q.uuid">
             <strong>{{ q.question }}</strong>
