@@ -33,12 +33,12 @@
                     <div class="card-footer hs-card-footer">
                         <div class="float-left">
                             <transition  name="fade" key="2">
-                                <button class="btn hs-btn-prev hs-btn-prev" v-if="showPrevBtn" @click="previousQuestion">Previous</button>
+                                <button class="btn hs-btn-prev" v-if="showPrevBtn" @click="previousQuestion">Previous</button>
                             </transition>
                         </div>
-                        <div class="float-right">
+                        <div class="float-left">
                             <transition  name="fade" key="3">
-                                <button class="btn hs-btn-next hs-btn-next" v-if="showNextBtn" @click="nextQuestion">Next</button>
+                                <button class="btn hs-btn-next" v-if="showNextBtn" @click="nextQuestion">Next</button>
                             </transition>
                         </div>
                     </div>
