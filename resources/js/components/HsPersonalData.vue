@@ -63,17 +63,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- <vue-google-autocomplete
-                    id="map"
-                    classname="form-control"
-                    placeholder="Start typing"
-                    v-on:placechanged="getAddressData"
-                > -->
-                <!-- </vue-google-autocomplete> -->
-                <!-- <hs-address-autocomplete></hs-address-autocomplete> -->
-                <!-- <vue-bootstrap-typeahead>
-                    
-                </vue-bootstrap-typeahead> -->
+                <hs-address-autocomplete></hs-address-autocomplete>
             </div>
         </div>
     </div>
@@ -81,22 +71,12 @@
 
 <script>
 
-import VueGoogleAutocomplete from 'vue-google-autocomplete';
-import VueBootstrapTypeahead from 'vue-bootstrap-typeahead'
-import HsAddressAutocomplete from './HsAddressAutocomplete';
+import hsAddressAutocomplete from './HsAddressAutocomplete';
 
 export default {
     components: {
-        'vue-google-autocomplete': VueGoogleAutocomplete,
-        'hs-address-autocomplete': HsAddressAutocomplete,
-        VueBootstrapTypeahead
+        'hs-address-autocomplete': hsAddressAutocomplete
     }
-    /* mounted() {
-        this.customer_address_street = new google.maps.places.Autocomplete(
-            (this.$refs.customer_address_street),
-            {types: ['geocode']}
-        );
-    } */
 }
 </script>
 

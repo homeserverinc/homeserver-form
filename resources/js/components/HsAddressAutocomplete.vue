@@ -1,46 +1,33 @@
 <template>
-    <input 
-        type="text" 
-        name="address_field" 
-        id="address_field"         
-        @change="doOnChange"
-        v-model="inputAddress"
-        autocomplete="true">
+  <div id="app">
+    <input ref="autocomplete" 
+        placeholder="Search" 
+        class="form-control"
+        onfocus="value = ''" 
+        type="text" />
+  </div>
 </template>
 
-<style lang="scss" scoped>
-
-</style>
-
 <script>
-const URL = 'https://maps.googleapis.com/maps/api/place/queryautocomplete/json';
-const ApiKEY = 'AIzaSyAXEKDJ6apFhd92r8DaBoNuFru26-8aR_I';
 
 export default {
-    data() {
-        return {
-            address: {}
-        }
-    },
-    computed: {
-        teste() {
+  methods: {
 
-        },
-        inputAddress: {
-            get() {
-                return this._inputAddress;
-            },
-            set(value) {
-                if (value.lenght > 2) {
-                    
-                }
-            }
-        }
-    },
-    methods: {
-        doOnChange(e) {
-            console.log(e);
-        }
-    }
+  },
+  mounted() {
+    this.autocomplete = new google.maps.places.Autocomplete(
+      (this.$refs.autocomplete),
+      {types: ['geocode']}
+    );
+    this.autocomplete.addListener('place_changed', () => {
+      let place = this.autocomplete.getPlace();
+      let ac = place.address_components;
+      let lat = place.geometry.location.lat();
+      let lon = place.geometry.location.lng();
+      let city = ac[0]["short_name"];
+
+      console.log(`The user picked ${city} with the coordinates ${lat}, ${lon}`);
+    });
+  }
 }
 </script>

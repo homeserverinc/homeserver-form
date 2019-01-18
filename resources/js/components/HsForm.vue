@@ -102,7 +102,8 @@ import hsPersonalData from './HsPersonalData';
 export default {
     props: {
         title: String,
-        siteUuid: String
+        siteUuid: String,
+        phoneNumber: String
     },
     components: {
         'hs-services-field': hsServicesField,
@@ -126,7 +127,7 @@ export default {
             return this.$store.state.finishedQuiz;
         },
         phone() {
-            return this.$store.state.site.phone.friendly_name;
+            return this.phoneNumber || this.$store.state.site.phone.friendly_name;
         }
     },
     methods: {
