@@ -25,7 +25,7 @@ class HomeServerApiClient {
      *
      * @var string
      */
-    protected $domain = 'https://homeserverinc.com';
+    protected $domain = 'http://localhost:8000';
 
     /**
      * Username used to access the API
@@ -260,6 +260,10 @@ class HomeServerApiClient {
 
     public function setLead($lead) {
         return $this->authenticatedRequest('/api/lead', 'POST', $lead);
+    }
+
+    public function setContact() {
+        return $this->authenticatedRequest('/api/site_contact', 'POST', $_POST);
     }
 
 }

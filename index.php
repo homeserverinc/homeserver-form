@@ -34,6 +34,14 @@ if ($apiClient->auth()) {
             echo $apiClient->getQuiz($param);
             break;
         
+        case 'contact':
+            include('contact.php');
+            break;
+
+        case 'contact_post':
+            echo $apiClient->setContact($param);
+            break;
+
         default:  
             include('home.php');
             break;
