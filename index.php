@@ -42,6 +42,10 @@ if ($apiClient->auth()) {
             echo $apiClient->setContact($param);
             break;
 
+        case 'teste':
+            include('mockup.php');
+            break;
+
         default:  
             include('home.php');
             break;

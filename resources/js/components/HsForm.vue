@@ -6,13 +6,6 @@
             </div>
         </transition>
         <hs-notifications></hs-notifications>
-
-        <!-- <transition name="load-transition" mode="out-in">
-            <div class="alert alert-danger" v-if="isLoading" style=" margin: auto; width: 100%; z-index=1">
-                <i class="fas fa-alert"></i>  Exemplo de mensagem de erro
-            </div>
-        </transition> -->
-
         <transition name="fade" mode="out-in" appear>
             <div v-if="!isLoading" key="1">
                 <hs-services-field v-if="!finishedQuiz"></hs-services-field>
@@ -27,8 +20,8 @@
                     <hs-progress></hs-progress>
                     <div class="card-body hs-card-body">
                         <hs-question v-if="!finishedQuiz"></hs-question>
-                        <!-- <hs-personal-data></hs-personal-data> -->
-                        <hs-quiz-review v-else></hs-quiz-review>
+                        <hs-personal-data v-else></hs-personal-data>
+                        <!-- <hs-quiz-review v-else></hs-quiz-review> -->
                     </div>
                     <div class="card-footer hs-card-footer">
                         <div class="float-left">

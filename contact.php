@@ -63,8 +63,7 @@
                                     <label class="custom-control-label" for="contact_afternoon">Afternoon</label>
                                 </div>
                                 <div class="custom-control custom-radio custom-control-inline mr-auto">
-                                    <input type="radio" id="contact_night" name="contact_time_preference" class="custom-control-input" value="night">
-                                    <label class="custom-control-label" for="contact_night">Night</label>
+                                    <input type="radio" id="contact_night" name="contact_time_preference" class="custom-control-input" value="evening">
                                 </div>
                             </div>
                         </div>
