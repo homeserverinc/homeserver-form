@@ -9,6 +9,18 @@ const defaultDuration = 8000;
 //Valid mutation names
 const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED';
 const NOTIFICATION_DISMISSED = 'NOTIFICATION_DISMISSED';
+const SET_PROJECT_DEAD_LINE = 'SET_PROJECT_DEAD_LINE';
+const SET_PROJECT_ADDITIONAL_INFO = 'SET_PROJECT_ADDITIONAL_INFO';
+const SET_PERSONAL_DATA_FIRST_NAME = 'SET_PERSONAL_DATA_FIRST_NAME';
+const SET_PERSONAL_DATA_LAST_NAME = 'SET_PERSONAL_DATA_LAST_NAME';
+const SET_PERSONAL_DATA_PHONE = 'SET_PERSONAL_DATA_PHONE';
+const SET_PERSONAL_DATA_EMAIL = 'SET_PERSONAL_DATA_EMAIL';
+const SET_PERSONAL_DATA_ADDRESS_STREET = 'SET_PERSONAL_DATA_ADDRESS_STREET';
+const SET_PERSONAL_DATA_ADDRESS_CITY = 'SET_PERSONAL_DATA_ADDRESS_CITY';
+const SET_PERSONAL_DATA_ADDRESS_STATE = 'SET_PERSONAL_DATA_ADDRESS_STATE';
+const SET_PERSONAL_DATA_ADDRESS_ZIP = 'SET_PERSONAL_DATA_ADDRESS_ZIP';
+const SET_SHOWING_PERSONAL_DATA_FORM = 'SET_SHOWING_PERSONAL_DATA_FORM';
+const SET_SHOWING_REVIEW_DATA = 'SET_SHOWING_REVIEW_DATA';
 
 Vue.use(Vuex);
 
@@ -25,7 +37,25 @@ export default new Vuex.Store({
         isLoading: true,
         showQuestionTitle: true,
         finishedQuiz: false,
-        notifications: []
+        showingPersonalDataForm: false,
+        showingReviewData: false,
+        notifications: [],
+        project: {
+            deadLine: 'im-flexible',
+            additionalInfo: null
+        },
+        personalData: {
+            firstName: null,
+            lastName: null,
+            phone: null,
+            email: null,
+            address: {
+                street: null,
+                city: null,
+                state: null,
+                zip: null
+            }
+        }
     },
     getters: {
         singleChoiceQuestion: (state) => {
@@ -121,7 +151,30 @@ export default new Vuex.Store({
         showPrevBtn: (state) => {
             return (state.answeredQuestions.length > 0);
         },
-        notifications: (state) => state.notifications.map(n => n.Raw)
+        notifications: (state) => state.notifications.map(n => n.Raw),
+        getProjectDeadLine: (state) => {
+            switch (state.project.deadLine) {
+                case 'im-flexible':
+                    return 'I\'m flexible';
+                    break;
+
+                case 'within-48-hours':
+                    return 'Within 48 hours';
+                    break;
+            
+                case 'within-a-week':
+                    return 'Within a week';
+                    break;
+
+                case 'within-a-month':
+                    return 'Within a month';
+                    break;
+                
+                case 'within-a-year':
+                    return 'Within a year';
+                    break;
+            }
+        }
     },
     actions: {
         getSite({ commit, dispatch }, siteUuid) {
@@ -216,6 +269,7 @@ export default new Vuex.Store({
                 commit('SET_FINISHED_QUIZ', false);
             } else {
                 commit('SET_FINISHED_QUIZ', true);
+                commit(SET_SHOWING_PERSONAL_DATA_FORM, true);
             }
         },
         addNotification({ commit }, notification) {
@@ -241,6 +295,14 @@ export default new Vuex.Store({
         dismissNotification(context, notification) {
             //Just pass payload
             context.commit(NOTIFICATION_DISMISSED, notification);
+        },
+        setShowingPersonalDataForm({commit}, value) {
+            commit(SET_SHOWING_PERSONAL_DATA_FORM, value);
+            commit(SET_SHOWING_REVIEW_DATA, !value);
+        },
+        setShowingReviewData({commit}, value) {
+            commit(SET_SHOWING_REVIEW_DATA, value);
+            commit(SET_SHOWING_PERSONAL_DATA_FORM, !value);
         }
     },
     mutations: {
@@ -325,6 +387,42 @@ export default new Vuex.Store({
         
             clearTimeout(state.notifications[i].TimeOut);
             state.notifications.splice(i, 1);
+        },
+        [SET_PROJECT_DEAD_LINE](state, value) {
+            state.project.deadLine = value;
+        },
+        [SET_PROJECT_ADDITIONAL_INFO](state, value) {
+            state.project.additionalInfo = value;
+        },
+        [SET_PERSONAL_DATA_FIRST_NAME](state, value) {
+            state.personalData.firstName = value;
+        },
+        [SET_PERSONAL_DATA_LAST_NAME](state, value) {
+            state.personalData.lastName = value;
+        },
+        [SET_PERSONAL_DATA_PHONE](state, value) {
+            state.personalData.phone = value;
+        },
+        [SET_PERSONAL_DATA_EMAIL](state, value) {
+            state.personalData.email = value;
+        },
+        [SET_PERSONAL_DATA_ADDRESS_STREET](state, value) {
+            state.personalData.address.street = value;
+        },
+        [SET_PERSONAL_DATA_ADDRESS_CITY](state, value) {
+            state.personalData.address.city = value;
+        },
+        [SET_PERSONAL_DATA_ADDRESS_STATE](state, value) {
+            state.personalData.address.state = value;
+        },
+        [SET_PERSONAL_DATA_ADDRESS_ZIP](state, value) {
+            state.personalData.address.zip = value;
+        },
+        [SET_SHOWING_PERSONAL_DATA_FORM](state, value) {
+            state.showingPersonalDataForm = value;
+        },
+        [SET_SHOWING_REVIEW_DATA](state, value) {
+            state.showingReviewData = value;
         }
     }
 });

@@ -35,11 +35,15 @@ if ($apiClient->auth()) {
             break;
         
         case 'contact':
-            include('contact.php');
-            break;
+            switch ($_SERVER['REQUEST_METHOD']) {
+                case 'GET':
+                    include('contact.php');
+                    break;
 
-        case 'contact_post':
-            echo $apiClient->setContact($param);
+                case 'POST':
+                    echo $apiClient->setContact($param);
+                    break;
+            }
             break;
 
         case 'teste':

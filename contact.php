@@ -14,7 +14,7 @@
         <div class="card-header">Contact form</div>
     </div>
     <div class="card-body">
-        <form method="POST" action="contact_post" >
+        <form method="POST" action="contact" >
             <!-- Site UUID to be related with this contact -->
             <input type="hidden" name="site_uuid" value="037bd1ad-5f46-4163-a3a3-e7d3769ae128">
             <div class="form-group">

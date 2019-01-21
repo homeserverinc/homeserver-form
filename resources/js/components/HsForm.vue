@@ -20,18 +20,19 @@
                     <hs-progress></hs-progress>
                     <div class="card-body hs-card-body">
                         <hs-question v-if="!finishedQuiz"></hs-question>
-                        <hs-personal-data v-else></hs-personal-data>
-                        <!-- <hs-quiz-review v-else></hs-quiz-review> -->
+                        <hs-personal-data v-if="showingPersonalDataForm"></hs-personal-data>
+                        <hs-quiz-review v-if="showingReviewData"></hs-quiz-review>
                     </div>
                     <div class="card-footer hs-card-footer">
                         <div class="float-left">
                             <transition  name="fade" key="2">
-                                <button class="btn hs-btn-prev" v-if="showPrevBtn" @click="previousQuestion">Previous</button>
+                                <button class="btn hs-btn-prev" v-if="showPrevBtn" @click="previousQuestion">{{prevBtnText}}</button>
                             </transition>
                         </div>
+                        <div v-if="showPrevBtn" class="m-1 float-left"></div>
                         <div class="float-left">
                             <transition  name="fade" key="3">
-                                <button class="btn hs-btn-next" v-if="showNextBtn" @click="nextQuestion">Next</button>
+                                <button class="btn hs-btn-next" v-if="showNextBtn" @click="nextQuestion">{{nextBtnText}}</button>
                             </transition>
                         </div>
                     </div>
@@ -114,31 +115,57 @@ export default {
             return this.$store.getters.showPrevBtn;
         },
         showNextBtn() {
-            return !this.$store.state.finishedQuiz;
+            return true;//this.$store.state.finishedQuiz;
         },
         finishedQuiz() {
             return this.$store.state.finishedQuiz;
         },
         phone() {
             return this.phoneNumber || this.$store.state.site.phone.friendly_name;
+        },
+        showingPersonalDataForm() {
+            return this.$store.state.showingPersonalDataForm;
+        },
+        showingReviewData() {
+            return this.$store.state.showingReviewData;
+        },
+        nextBtnText() {
+            return (this.showingReviewData) ? 'Submit the projext' : 'Next';
+        },
+        prevBtnText() {
+            return (this.showingReviewData) ? 'Go back' : 'Previous';
         }
     },
     methods: {
         nextQuestion() {
-            if (this.validateAnswer()) {
-                return this.$store.dispatch('goToNextQuestion');
+            if (!this.finishedQuiz) {
+                if (this.validateAnswer()) {
+                    return this.$store.dispatch('goToNextQuestion');
+                } else {
+                    this.$store.dispatch('addNotification', {
+                        title: 'Question is not answered.',
+                        text: 'No answer selected. Please, verify before go ahead.',
+                        type: 'danger',
+                        duration: 8000
+                    });
+                }
             } else {
-                this.$store.dispatch('addNotification', {
-                    title: 'Question is not answered.',
-                    text: 'No answer selected. Please, verify before go ahead.',
-                    type: 'danger',
-                    duration: 8000
-                });
+                if (this.$store.state.showingPersonalDataForm) {
+                    this.$store.dispatch('setShowingReviewData', true);
+                } else if (this.$store.state.showingReviewData) {
+                    console.log('aqui vai o post final....');
+                }
             }
         },
         previousQuestion() {
-            return this.$store.dispatch('goToPrevQuestion');
-
+            if (this.$store.state.showingReviewData) {
+                this.$store.dispatch('setShowingReviewData', false);
+            } else {
+                if (this.showingPersonalDataForm) {
+                    this.$store.commit('SET_SHOWING_PERSONAL_DATA_FORM', false);
+                }
+                return this.$store.dispatch('goToPrevQuestion');
+            }
         },
         validateAnswer() {
             return this.$store.getters.questionAnswered;

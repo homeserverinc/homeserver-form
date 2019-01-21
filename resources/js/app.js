@@ -8,6 +8,25 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+
+/**
+ * Formats a phone number.
+ * Example: 123-456-7890 => (123) 456-7890
+ *
+ * @param {String} phone
+ * @return {Void}
+ */
+Vue.filter('phone', {
+    read: (phone) => {
+        return '$'+phone.toFixed(2)
+    },
+    write: (phone, oldPhone) => {
+        return phone.replace(/[^0-9]/g, '')
+                .replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+    }
+});
+
+
 /* window.Vuex = require('vuex');  */
 
 /**
