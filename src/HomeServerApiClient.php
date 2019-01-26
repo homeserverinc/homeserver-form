@@ -12,20 +12,13 @@ use HomeServerInc\API\CurlResponse;
  * @api https://homeserverinc.com/api
  */
 class HomeServerApiClient {
-
-    /**
-     * Error Messages reported by the cUrl calls
-     *
-     * @var string
-     */
-    public $errorMsg = '';
-
     /**
      * Domain used to make API Calls
      *
      * @var string
      */
-    protected $domain = 'https://homeserverinc.com';
+    //protected $domain = 'https://homeserverinc.com';
+    protected $domain = 'http://localhost:8000';
 
     /**
      * Username used to access the API
@@ -103,16 +96,41 @@ class HomeServerApiClient {
     }
 
     /**
+     * Undocumented function
+     *
+     * @param resource $curl
+     * @return CurlResponse
+     */
+    protected function curlExec($curl) {
+        $response = curl_exec($curl);
+
+        if (curl_errno($curl)) {
+            return new CurlResponse(
+                json_encode(
+                    Array(
+                        'error' => Array(
+                            curl_error($curl)
+                        ), 
+                        'status' => 'error')
+                    )
+                );
+        } else {
+            return new CurlResponse($response);
+        }
+    }
+
+    /**
      * Take the cUrl resourse, make the call and return a object with the response
      *
      * @param resource $curl
      * @return CurlResponse
      */
     public function getResponse($curl) {
-        $response = curl_exec($curl);
-        $error = curl_error($curl);
-
-        return new CurlResponse(json_decode($response, true), $error);
+        try {
+            return $this->curlExec($curl);
+        } catch (\Exception $e) {
+            return new CurlResponse($e->getMessage, 'error');
+        }
     }
 
     /**
@@ -121,7 +139,7 @@ class HomeServerApiClient {
      * @return bool
      */
     public function auth() {
-        if ($_COOKIE['_HomeServerIncToken']) {
+        if (isset($_COOKIE['_HomeServerIncToken'])) {
             $this->token = $_COOKIE['_HomeServerIncToken'];
             $this->tokenType = $_COOKIE['_HomeServerIncTokenType'];
             return true;
@@ -141,17 +159,16 @@ class HomeServerApiClient {
 
         $curl = $this->curlInit($url, $method, $postFields, $httpHeader);
 
-        $response = $this->getResponse($curl);
+        $response = json_decode($this->getResponse($curl));
 
-        if ($response->hasError) {
-            $this->errorMsg = $respone->errorMsg;
-            return false;
-        } else {
-            $this->token = $response->data['access_token'];
-            $this->tokenType = $response->data['token_type'];
+        if ($response->status == 'success') {
+            $this->token = $response->data->access_token;
+            $this->tokenType = $response->data->token_type;
             setcookie('_HomeServerIncToken', $this->token, time()+$this->tokenTTL);
             setcookie('_HomeServerIncTokenType', $this->tokenType, time()+$this->tokenTTL);
-            return true;
+            return json_encode($response);
+        } else {
+            return json_encode($response);
         }
     }
 
@@ -177,14 +194,19 @@ class HomeServerApiClient {
      * @return CurlResponse
      */
     protected function authenticatedRequest($url, $method = 'POST', $postFields = []) {
-        return $this->getResponse(
-            $this->curlInit(
-                $url, 
-                $method, 
-                $postFields, 
-                $this->getAuthenticatedHttpHeader()
-            )
-        );
+        $res = json_decode($this->auth());
+        if (isset($res->data->error)) {
+            return json_encode($res);
+        } else {
+            return $this->getResponse(
+                $this->curlInit(
+                    $url, 
+                    $method, 
+                    $postFields, 
+                    $this->getAuthenticatedHttpHeader()
+                )
+            );
+        }
     }
 
     /**
@@ -258,8 +280,8 @@ class HomeServerApiClient {
         return $this->authenticatedRequest('/api/question/'.$questionId, 'GET');
     }
 
-    public function setLead($lead) {
-        return $this->authenticatedRequest('/api/lead', 'POST', $lead);
+    public function setLead() {
+        return $this->authenticatedRequest('/api/lead', 'POST', $_POST);
     }
 
     public function setContact() {

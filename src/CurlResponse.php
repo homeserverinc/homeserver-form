@@ -10,25 +10,21 @@ namespace HomeServerInc\API;
  */
 class CurlResponse {
     /**
-     * Hold an array with response data from cUrl calls
+     * Hold a data object from cUrl calls
      *
      * @var array
      */
-    public $data = [];
+    public $data = false;
 
     /**
-     * Hold the error message of the cUrl call
+     * Hold the status of the call, where:
+     * success -> all ok
+     * fail -> validation erros
+     * error -> exceptions and other errors
      *
      * @var string
      */
-    public $errorMsg = '';
-
-    /**
-     * Indicate if a cUrl call return a error state
-     *
-     * @var boolean
-     */
-    public $hasError = false;
+    public $status = 'success';
 
     /**
      * Method constructor
@@ -36,10 +32,10 @@ class CurlResponse {
      * @param Array $data
      * @param String $errorMsg
      */
-    public function __construct($data, $errorMsg) {
-        $this->data = $data;
-        $this->errorMsg = $errorMsg;
-        $this->hasError = ($errorMsg != '');
+    public function __construct($response) {
+        $response = json_decode($response);
+        $this->data = isset($response->data) ? $response->data : $response;
+        $this->status = isset($response->status) ? $response->status : 'success';
     }
 
     /**
@@ -48,6 +44,7 @@ class CurlResponse {
      * @return string
      */
     public function __toString() {
+        header('Content-type: application/json');
         return json_encode($this);
     }
 }

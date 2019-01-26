@@ -1,6 +1,6 @@
 <template>
-    <div class="hs-quiz-review">
-        <transition-group appear name="slide" mode="out-in">
+    <transition name="fade" mode="in-out" appear>
+        <div class="hs-quiz-review">
             <div class="hs-question hs-title-overflow" v-for="q in questions" :key="q.uuid">
                 <strong>{{ q.question }}</strong>
                 <div class="list-group hs-answers">
@@ -14,9 +14,7 @@
                     </div>
                 </div>
             </div>
-        </transition-group>
-        <div class="m-3 b-1"></div>
-        <transition appear name="slide" mode="out-in">
+            <hr />
             <div class="hs-question hs-title-overflow">
                 <strong>When would you like to get this done?</strong>
                 <div class="list-group hs-answers">
@@ -25,8 +23,6 @@
                     </div>
                 </div>
             </div>
-        </transition>
-        <transition appear name="slide" mode="out-in" v-if="projectAdditionalInfo !== null">
             <div class="hs-question hs-title-overflow">
                 <strong>Explain the project</strong>
                 <div class="list-group hs-answers">
@@ -35,8 +31,6 @@
                     </div>
                 </div>
             </div>
-        </transition>
-        <transition appear name="slide" mode="out-in">
             <div class="hs-question hs-title-overflow">
                 <strong>First Name / Last Name</strong>
                 <div class="list-group hs-answers">
@@ -45,8 +39,6 @@
                     </div>
                 </div>
             </div>
-        </transition>
-        <transition appear name="slide" mode="out-in" v-if="phone !== null">
             <div class="hs-question hs-title-overflow">
                 <strong>Phone</strong>
                 <div class="list-group hs-answers">
@@ -55,8 +47,6 @@
                     </div>
                 </div>
             </div>
-        </transition>
-        <transition appear name="slide" mode="out-in" v-if="email !== null">
             <div class="hs-question hs-title-overflow">
                 <strong>E-mail</strong>
                 <div class="list-group hs-answers">
@@ -65,34 +55,28 @@
                     </div>
                 </div>
             </div>
-        </transition>
-    </div>
+            <div class="hs-question hs-title-overflow">
+                <strong>Address</strong>
+                <div class="list-group hs-answers">
+                    <div class="hs-answer">
+                        {{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.zip }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </transition>
 </template>
 
 <style lang="scss" scoped>
-    .hs-answers {
-        > div {
-            margin-left: 0.75rem;
-        }
-    }
-    .slide-leave-active,
-    .slide-enter-active {
-        transition: .3s ease;
-        opacity: 1;
-    }
-    .slide-enter {
-        transform: translate(10%, 0);
-        opacity: 0;
-    }
-    .slide-leave-to {
-        transition: .2s ease-out;
-        opacity: 0;
+    hr {
+        border-top: 1px solid #8c8b8b;
+        border-bottom: 1px solid #fff;
     }
 </style>
 
-
-
 <script>
+import { PROJECT_DEADLINE } from '../constants';
+
 export default {
     computed: {
         questions() {
@@ -105,22 +89,25 @@ export default {
             return this.$store.state.answerTypes;
         },
         projectDeadLine() {
-            return this.$store.getters.getProjectDeadLine;
+            return PROJECT_DEADLINE[this.$store.state.personal.deadline];
         },
         projectAdditionalInfo() {
-            return this.$store.state.project.additionalInfo;
+            return this.$store.state.personal.additionalInfo;
         },
         firstName() {
-            return this.$store.state.personalData.firstName;
+            return this.$store.state.personal.firstName;
         },
         lastName() {
-            return this.$store.state.personalData.lastName;
+            return this.$store.state.personal.lastName;
         },
         phone() {
-            return this.$store.state.personalData.phone;
+            return this.$store.state.personal.phoneNumber;
         },
         email() {
-            return this.$store.state.personalData.email;
+            return this.$store.state.personal.email;
+        },
+        address() {
+            return this.$store.state.personal.address;
         }
     },
     methods: {

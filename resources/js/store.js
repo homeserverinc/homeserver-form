@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Vuex, { Store } from 'vuex';
+import Vuex from 'vuex';
 import Axios from 'axios';
 import { QUESTION_TYPES, ANSWER_TYPES } from './constants';
 
@@ -9,24 +9,38 @@ const defaultDuration = 8000;
 //Valid mutation names
 const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED';
 const NOTIFICATION_DISMISSED = 'NOTIFICATION_DISMISSED';
-const SET_PROJECT_DEAD_LINE = 'SET_PROJECT_DEAD_LINE';
-const SET_PROJECT_ADDITIONAL_INFO = 'SET_PROJECT_ADDITIONAL_INFO';
-const SET_PERSONAL_DATA_FIRST_NAME = 'SET_PERSONAL_DATA_FIRST_NAME';
-const SET_PERSONAL_DATA_LAST_NAME = 'SET_PERSONAL_DATA_LAST_NAME';
-const SET_PERSONAL_DATA_PHONE = 'SET_PERSONAL_DATA_PHONE';
-const SET_PERSONAL_DATA_EMAIL = 'SET_PERSONAL_DATA_EMAIL';
-const SET_PERSONAL_DATA_ADDRESS_STREET = 'SET_PERSONAL_DATA_ADDRESS_STREET';
-const SET_PERSONAL_DATA_ADDRESS_CITY = 'SET_PERSONAL_DATA_ADDRESS_CITY';
-const SET_PERSONAL_DATA_ADDRESS_STATE = 'SET_PERSONAL_DATA_ADDRESS_STATE';
-const SET_PERSONAL_DATA_ADDRESS_ZIP = 'SET_PERSONAL_DATA_ADDRESS_ZIP';
 const SET_SHOWING_PERSONAL_DATA_FORM = 'SET_SHOWING_PERSONAL_DATA_FORM';
 const SET_SHOWING_REVIEW_DATA = 'SET_SHOWING_REVIEW_DATA';
+
+const INIT_STORE_STATE = {
+    leadUuid: null,
+    quiz: {
+        uuid: null
+    },
+    currentQuestion: {},
+    answeredQuestions: [],
+    services: [],
+    service: {},
+    site: {},
+    answerTypes: {},
+    questionTypes: {},
+    isLoading: true,
+    showQuestionTitle: true,
+    finishedQuiz: false,
+    showingPersonalDataForm: false,
+    showingReviewData: false,
+    notifications: [],
+    revisedData: false
+}
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        quiz: {},
+        leadUuid: null,
+        quiz: {
+            uuid: null
+        },
         currentQuestion: {},
         answeredQuestions: [],
         services: [],
@@ -40,22 +54,7 @@ export default new Vuex.Store({
         showingPersonalDataForm: false,
         showingReviewData: false,
         notifications: [],
-        project: {
-            deadLine: 'im-flexible',
-            additionalInfo: null
-        },
-        personalData: {
-            firstName: null,
-            lastName: null,
-            phone: null,
-            email: null,
-            address: {
-                street: null,
-                city: null,
-                state: null,
-                zip: null
-            }
-        }
+        revisedData: false,
     },
     getters: {
         singleChoiceQuestion: (state) => {
@@ -152,41 +151,37 @@ export default new Vuex.Store({
             return (state.answeredQuestions.length > 0);
         },
         notifications: (state) => state.notifications.map(n => n.Raw),
-        getProjectDeadLine: (state) => {
-            switch (state.project.deadLine) {
-                case 'im-flexible':
-                    return 'I\'m flexible';
-                    break;
-
-                case 'within-48-hours':
-                    return 'Within 48 hours';
-                    break;
-            
-                case 'within-a-week':
-                    return 'Within a week';
-                    break;
-
-                case 'within-a-month':
-                    return 'Within a month';
-                    break;
-                
-                case 'within-a-year':
-                    return 'Within a year';
-                    break;
+        submitData: (state) => {
+            if (state.showingPersonalDataForm || state.showingReviewData) {
+                return {
+                    'leadUuid': state.leadUuid,
+                    'revisedData': state.revisedData,
+                    'quiz': state.quiz.uuid,
+                    'personalData': state.personal,
+                    'answeredQuestions': state.answeredQuestions
+                }
+            } else {
+                return {}
             }
         }
     },
     actions: {
+        resetState({commit}) {
+            commit('personal/resetState');
+            commit('restetState');
+        },
         getSite({ commit, dispatch }, siteUuid) {
             commit('SET_LOADING_STATE', true);
             Axios
                 .get('/site/'+siteUuid)
-                .then(async r => r.data.data)
+                .then(async r => r.data)
                 .then(site => {
-                    commit('SET_SITE', site);
-                    commit('SET_ANSWER_TYPES', ANSWER_TYPES);
-                    commit('SET_QUESTION_TYPES', QUESTION_TYPES);
-                    dispatch('getServices');
+                    if (site.status == 'success') {
+                        commit('SET_SITE', site.data);
+                        commit('SET_ANSWER_TYPES', ANSWER_TYPES);
+                        commit('SET_QUESTION_TYPES', QUESTION_TYPES);
+                        dispatch('getServices');
+                    }
                 });
         },
         getServices({commit, dispatch, state}) {
@@ -303,6 +298,18 @@ export default new Vuex.Store({
         setShowingReviewData({commit}, value) {
             commit(SET_SHOWING_REVIEW_DATA, value);
             commit(SET_SHOWING_PERSONAL_DATA_FORM, !value);
+        },
+        sendData({getters}) {
+            Axios
+                .post('/submit-lead', getters.submitData)
+                .then(async (response) => {
+                    console.log(response);
+                })
+                .then(quiz => {
+                    commit('SET_QUIZ', quiz);
+                    dispatch('getQuestion');
+                    commit('SET_LOADING_STATE', false);
+                });
         }
     },
     mutations: {
@@ -388,41 +395,14 @@ export default new Vuex.Store({
             clearTimeout(state.notifications[i].TimeOut);
             state.notifications.splice(i, 1);
         },
-        [SET_PROJECT_DEAD_LINE](state, value) {
-            state.project.deadLine = value;
-        },
-        [SET_PROJECT_ADDITIONAL_INFO](state, value) {
-            state.project.additionalInfo = value;
-        },
-        [SET_PERSONAL_DATA_FIRST_NAME](state, value) {
-            state.personalData.firstName = value;
-        },
-        [SET_PERSONAL_DATA_LAST_NAME](state, value) {
-            state.personalData.lastName = value;
-        },
-        [SET_PERSONAL_DATA_PHONE](state, value) {
-            state.personalData.phone = value;
-        },
-        [SET_PERSONAL_DATA_EMAIL](state, value) {
-            state.personalData.email = value;
-        },
-        [SET_PERSONAL_DATA_ADDRESS_STREET](state, value) {
-            state.personalData.address.street = value;
-        },
-        [SET_PERSONAL_DATA_ADDRESS_CITY](state, value) {
-            state.personalData.address.city = value;
-        },
-        [SET_PERSONAL_DATA_ADDRESS_STATE](state, value) {
-            state.personalData.address.state = value;
-        },
-        [SET_PERSONAL_DATA_ADDRESS_ZIP](state, value) {
-            state.personalData.address.zip = value;
-        },
         [SET_SHOWING_PERSONAL_DATA_FORM](state, value) {
             state.showingPersonalDataForm = value;
         },
         [SET_SHOWING_REVIEW_DATA](state, value) {
             state.showingReviewData = value;
+        },
+        resetState(state) {
+            state = Object.assign(state, INIT_STORE_STATE);
         }
     }
 });

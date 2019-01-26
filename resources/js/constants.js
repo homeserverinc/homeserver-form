@@ -9,3 +9,11 @@ export const QUESTION_TYPES = {
     'SINGLE_CHOICE': '4cd9927e-717a-4726-b5e6-e6532201dfad',
     'MULTIPLE_CHOICE': '9f21912d-3506-468e-a2c4-56b8a5e8c686'
 };
+
+export const PROJECT_DEADLINE = {
+    'im-flexible': 'I\'m Flexible',
+    'within-48-hours': 'Within 48 hours',
+    'within-a-week': 'Within a week',
+    'within-a-month': 'Within a month',
+    'within-a-year': 'Within a year'
+}
