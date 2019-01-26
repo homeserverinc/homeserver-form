@@ -297,4 +297,13 @@ class HomeServerApiClient {
         return $this->authenticatedRequest('/api/site_contact', 'POST', $_POST);
     }
 
+    /**
+     * Post a new contractor subscription request
+     *
+     * @return CurlResponse
+     */
+    public function setContractor() {
+        return $this->authenticatedRequest('/api/contractor', 'POST', $_POST);
+    }
+
 }
