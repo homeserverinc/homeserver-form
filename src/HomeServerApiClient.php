@@ -279,10 +279,20 @@ class HomeServerApiClient {
         return $this->authenticatedRequest('/api/question/'.$questionId, 'GET');
     }
 
+    /**
+     * Post a new lead to the HomeServer System
+     *
+     * @return CurlResponse
+     */
     public function setLead() {
         return $this->authenticatedRequest('/api/lead', 'POST', $_POST);
     }
 
+    /**
+     * Post a new contact request to the HomeServer System
+     *
+     * @return CurlResponse
+     */
     public function setContact() {
         return $this->authenticatedRequest('/api/site_contact', 'POST', $_POST);
     }
