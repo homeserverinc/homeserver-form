@@ -18,6 +18,7 @@ class HomeServerApiClient {
      * @var string
      */
     protected $domain = 'https://homeserverinc.com';
+    //protected $domain = 'http://localhost:8000';
 
     /**
      * Username used to access the API
@@ -98,23 +99,19 @@ class HomeServerApiClient {
      * Undocumented function
      *
      * @param resource $curl
-     * @return CurlResponse
+     * @return StdClass
      */
     protected function curlExec($curl) {
         $response = curl_exec($curl);
-
         if (curl_errno($curl)) {
-            return new CurlResponse(
-                json_encode(
-                    Array(
-                        'error' => Array(
-                            curl_error($curl)
-                        ), 
-                        'status' => 'error')
-                    )
+            return (Object) Array(
+                    'error' => Array(
+                        curl_error($curl)
+                    ), 
+                    'status' => 'error'
                 );
         } else {
-            return new CurlResponse($response);
+            return $response;
         }
     }
 
@@ -128,7 +125,12 @@ class HomeServerApiClient {
         try {
             return $this->curlExec($curl);
         } catch (\Exception $e) {
-            return new CurlResponse($e->getMessage, 'error');
+            return (Object) Array(
+                    'data' => Array(
+                        'errorr' => $e->getMessage
+                    ),
+                    'status' => 'error'
+                );
         }
     }
 
@@ -160,14 +162,15 @@ class HomeServerApiClient {
 
         $response = json_decode($this->getResponse($curl));
 
-        if ($response->status == 'success') {
-            $this->token = $response->data->access_token;
-            $this->tokenType = $response->data->token_type;
+        if (isset($response->access_token)) {
+            $this->token = $response->access_token;
+            $this->tokenType = $response->token_type;
+            $this->tokenTTL = $response->expires_in;
             setcookie('_HomeServerIncToken', $this->token, time()+$this->tokenTTL);
             setcookie('_HomeServerIncTokenType', $this->tokenType, time()+$this->tokenTTL);
-            return json_encode($response);
+            return true;
         } else {
-            return json_encode($response);
+            return false;
         }
     }
 
@@ -193,9 +196,13 @@ class HomeServerApiClient {
      * @return CurlResponse
      */
     protected function authenticatedRequest($url, $method = 'POST', $postFields = []) {
-        $res = json_decode($this->auth());
-        if (isset($res->data->error)) {
-            return json_encode($res);
+        if (!$this->auth()) {
+            return json_encode(Array(
+                'data' => Array(
+                    'error' => 'Not authenticated'
+                ),
+                'status' => 'error'
+            ));
         } else {
             return $this->getResponse(
                 $this->curlInit(

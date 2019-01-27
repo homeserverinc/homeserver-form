@@ -44,7 +44,7 @@ class CurlResponse {
      * @return string
      */
     public function __toString() {
-        header('Content-type: application/json');
+        //header('Content-type: application/json');
         return json_encode($this);
     }
 }
