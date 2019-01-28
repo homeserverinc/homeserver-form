@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import Axios from 'axios';
 import { QUESTION_TYPES, ANSWER_TYPES } from './constants';
+import qs from 'qs';
 
 //Notification default duration in milliseconds
 const defaultDuration = 8000;
@@ -11,6 +12,7 @@ const NOTIFICATION_ADDED = 'NOTIFICATION_ADDED';
 const NOTIFICATION_DISMISSED = 'NOTIFICATION_DISMISSED';
 const SET_SHOWING_PERSONAL_DATA_FORM = 'SET_SHOWING_PERSONAL_DATA_FORM';
 const SET_SHOWING_REVIEW_DATA = 'SET_SHOWING_REVIEW_DATA';
+const SET_LEAD_UUID = 'SET_LEAD_UUID';
 
 const INIT_STORE_STATE = {
     leadUuid: null,
@@ -30,7 +32,8 @@ const INIT_STORE_STATE = {
     showingPersonalDataForm: false,
     showingReviewData: false,
     notifications: [],
-    revisedData: false
+    revisedData: false,
+    lead_uuid: null
 }
 
 Vue.use(Vuex);
@@ -55,6 +58,7 @@ export default new Vuex.Store({
         showingReviewData: false,
         notifications: [],
         revisedData: false,
+        lead_uuid: null
     },
     getters: {
         singleChoiceQuestion: (state) => {
@@ -166,6 +170,43 @@ export default new Vuex.Store({
         }
     },
     actions: {
+        sendLeadData({state}, verified = false) {
+            const data = {
+                deadline: state.personal.deadline,
+                additionalInfo: state.personal.additionalInfo,
+                customer: {
+                    first_name: state.personal.firstName,
+                    last_name: state.personal.lastName,
+                    street: state.personal.address.street,
+                    city: state.personal.address.city,
+                    state: state.personal.address.state,
+                    zip: state.personal.address.zip,
+                    phone1: state.personal.phoneNumber,
+                    email1: state.personal.email,
+                },
+                service_uuid: state.service,
+                quiz_uuid: state.quiz.uuid, 
+                verified_data: verified,
+                questions: state.answeredQuestions,
+                lead_uuid: state.lead_uuid
+            };
+
+            const config = {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }
+
+            Axios.post('/lead', qs.stringify(data), config)
+                .then(async (res) => {
+                    if (res.status == 'success') {
+                        console.log('sucesso!');
+                        commit(SET_LEAD_UUID, res.data.uuid);
+                    } else {
+                        console.log(res.data);
+                    }
+                });
+        },
         resetState({commit}) {
             commit('personal/resetState');
             commit('restetState');
@@ -403,6 +444,9 @@ export default new Vuex.Store({
         },
         resetState(state) {
             state = Object.assign(state, INIT_STORE_STATE);
+        },
+        [SET_LEAD_UUID](state, value) {
+            state.lead_uuid = value;
         }
     }
 });

@@ -37,7 +37,7 @@ switch ($url) {
     case 'contact':
         $old = null;
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $res = json_decode($apiClient->setContact($param));
+            $res = json_decode($apiClient->setContact());
             switch ($res->status) {
                 case 'fail':
                     $old = $res->data->old;
@@ -83,8 +83,8 @@ switch ($url) {
         include('contractors.php');
         break;
 
-    case 'submit-lead':
-        echo $apiClient->setLead($param);
+    case 'lead':
+        echo $apiClient->setLead();
         break;
 
     case 'teste':

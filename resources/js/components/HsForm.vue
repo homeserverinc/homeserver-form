@@ -153,11 +153,11 @@ export default {
                 if (this.$store.state.showingPersonalDataForm) {
                     this.$store.dispatch('personal/validateForm')
                     if (!this.$store.state.personal.errors.has) {
-                        this.$store.dispatch('sendUnrevisedData');
+                        this.$store.dispatch('sendLeadData');
                         this.$store.dispatch('setShowingReviewData', true);
                     }
                 } else if (this.$store.state.showingReviewData) {
-                    console.log('aqui vai o post final....');
+                    this.$store.dispatch('sendLeadData', true);
                 }
             }
         },
