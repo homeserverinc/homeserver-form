@@ -1,8 +1,10 @@
-<template>      
-    <div v-if="showMe">
-        <div style="margin-bottom: 1rem"></div>
-        <textarea class="form-control hs-input-text" v-model="customText" cols="30" rows="5">
-        </textarea>
+<template>
+    <div
+        class="list-group-item"
+        :class="['textarea-list-group-'+suffixTheme, {'shadow': enableShadow}]"
+        v-if="showMe"
+    >
+        <textarea class="form-control hs-input-text" v-model="customText" cols="30" rows="4"></textarea>
     </div>
 </template>
 
@@ -13,24 +15,28 @@ export default {
     },
     computed: {
         customTextId() {
-            return this.uuid+'_text';
+            return this.uuid + "_text";
         },
         answer() {
-            return this.$store.getters.answer(this.uuid);
+            return this.$store.getters["HsQuiz/answer"](this.uuid);
         },
         showMe() {
-            var answersSelecteds = this.$store.getters.answerIsSelected(this.uuid);
-            
+            var answersSelecteds = this.$store.getters[
+                "HsQuiz/answerIsSelected"
+            ](this.uuid);
+
             if (answersSelecteds != undefined) {
                 switch (this.answer.answer_type_uuid) {
-                    case this.$store.state.answerTypes.SINGLE_CHOICE_TEXT:
+                    case this.$store.state.HsQuiz.answerTypes
+                        .SINGLE_CHOICE_TEXT:
                         answersSelecteds.uuid == this.uuid;
                         break;
 
-                    case this.$store.state.answerTypes.MULTIPLE_CHOICE_TEXT:
+                    case this.$store.state.HsQuiz.answerTypes
+                        .MULTIPLE_CHOICE_TEXT:
                         return (answersSelecteds.uuid = this.uuid);
                         break;
-                
+
                     default:
                         return false;
                         break;
@@ -38,16 +44,25 @@ export default {
             }
         },
         isSingleChoice() {
-            return (this.answer.answer_type_uuid == this.$store.state.answerTypes.SINGLE_CHOICE_TEXT);
+            return (
+                this.answer.answer_type_uuid ==
+                this.$store.state.HsQuiz.answerTypes.SINGLE_CHOICE_TEXT
+            );
         },
         customText: {
-            get () {
-                return this.$store.state.currentQuestion.custom_answer;
+            get() {
+                return this.$store.state.HsQuiz.currentQuestion.custom_answer;
             },
-            set (value) {
-                this.$store.dispatch('setCustomText', value);
+            set(value) {
+                this.$store.commit("HsQuiz/setCustomText", value);
             }
+        },
+        suffixTheme() {
+            return this.$store.state.suffixTheme;
+        },
+        enableShadow() {
+            return this.$store.state.enableShadow;
         }
     }
-}
+};
 </script>

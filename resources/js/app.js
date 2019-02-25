@@ -39,13 +39,13 @@ Vue.filter('phone', {
 
 //var csrf_token = $('meta[name="csrf-token"]').attr('content');
 
-import hsForm from './components/HsForm.vue';
-import store from './store';
+/* import hsForm from './components/HsForm.vue'; */
+/* import store from './store'; */
 
 const app = new Vue({
     el: '#app',
     store,
-    components:{
+    /* components:{
         'hs-form': hsForm,
-    },
+    }, */
 });

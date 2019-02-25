@@ -17,8 +17,8 @@ class HomeServerApiClient {
      *
      * @var string
      */
-    protected $domain = 'https://homeserverinc.com';
-    //protected $domain = 'http://localhost:8000';
+    //protected $domain = 'https://homeserverinc.com';
+    protected $domain = 'http://localhost:8000';
 
     /**
      * Username used to access the API
@@ -253,23 +253,23 @@ class HomeServerApiClient {
     }
 
     /**
-     * Make a call to get all services from a given Category UUID
+     * Make a call to get all cagetories from a given Site UUID
      *
      * @param $uuid
      * @return CurlResponse
      */
-    public function getServices($uuid) {
-        return $this->authenticatedRequest('/api/services/'.$uuid, 'GET');
+    public function getCategories($uuid) {
+        return $this->authenticatedRequest('/api/categories/'.$uuid, 'GET');
     }
 
     /**
-     * Get the info of a Service by the given ID
+     * Get the info of a Category by the given UUID
      *
-     * @param Int $serviceId
+     * @param $uuid
      * @return CurlResponse
      */
-    public function getService($serviceId) {
-        return $this->authenticatedRequest('/api/service/'.$serviceId, 'GET');
+    public function getCategory($uuid) {
+        return $this->authenticatedRequest('/api/category/'.$uuid, 'GET');
     }
 
     public function getQuiz($uuid) {
@@ -313,4 +313,13 @@ class HomeServerApiClient {
         return $this->authenticatedRequest('/api/contractor', 'POST', $_POST);
     }
 
+
+    /**
+     * Post a pre lead information
+     * 
+     * @return Lead
+     */
+    public function setPreLead() {
+        return $this->authenticatedRequest('/api/pre_lead', 'POST', $_POST);
+    }
 }

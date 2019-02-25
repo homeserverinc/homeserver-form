@@ -14,12 +14,12 @@ $param = isset($request[2]) ? $request[2] : null;
 $apiClient = new HomeServerApiClient('superadministrator@app.com', 'password');
 $apiClient->auth();
 switch ($url) {
-    case 'service':
-        echo $apiClient->getService($param);
+    case 'category':
+        echo $apiClient->getCategory($param);
         break;
 
-    case 'services':
-        echo $apiClient->getServices($param);
+    case 'categories':
+        echo $apiClient->getCategories($param);
         break;       
 
     case 'question':
@@ -85,6 +85,10 @@ switch ($url) {
 
     case 'lead':
         echo $apiClient->setLead();
+        break;
+
+    case 'pre_lead':
+        echo $apiClient->setPreLead();
         break;
 
     case 'teste':

@@ -11,7 +11,11 @@
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome.scss";
 @import "node_modules/@fortawesome/fontawesome-free/scss/brands.scss";
 @import "node_modules/@fortawesome/fontawesome-free/scss/solid.scss";
+@import "node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
 
 /* Bootswatch */
 @import "node_modules/bootswatch/dist/united/variables";
 @import "node_modules/bootswatch/dist/united/bootswatch";
+
+/* list items */
+@import "./hs_leads_form.scss";
