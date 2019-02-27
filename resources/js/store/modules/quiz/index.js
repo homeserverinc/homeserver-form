@@ -130,11 +130,11 @@ const getters = {
 };
 
 const actions = {
-	apiGetQuiz({ state, commit, getters, rootState }, serviceUuid) {
+	apiGetQuiz({ state, commit, getters, rootState }, categoryUuid) {
 		if (!rootState.isLoading) {
 			commit("setLoading", true, { root: true });
 		}
-		Axios.get("/quiz/" + serviceUuid)
+		Axios.get("/quiz/" + categoryUuid)
 			.then(r => {
 				commit("setQuiz", r.data.data);
 				commit(

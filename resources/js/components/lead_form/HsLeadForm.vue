@@ -159,7 +159,6 @@ export default {
 			return new Date().getFullYear();
 		},
 		curEl() {
-			console.log(this);
 			return this.$children.find(
 				c => c.$options._componentTag === this.currentComponent
 			);
@@ -167,9 +166,6 @@ export default {
 	},
 	methods: {
 		next() {
-			console.log(this);
-			console.log(this.$children[0]);
-			//this.$store.dispatch("next", this.$children[0]);
 			this.$store.dispatch("next", this.curEl);
 		},
 		prev() {
