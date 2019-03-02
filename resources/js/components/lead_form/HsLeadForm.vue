@@ -33,7 +33,7 @@
 					:class="['card-footer hs-card-footer-'+suffixTheme, {'shadow-sm': enableShadow, 'pb-1': currentComponent === 'HsQuizReview'}]"
 					v-if="currentComponent != 'HsFinished'"
 				>
-					<button class="btn btn-info" @click="toggle"><i class="fas fa-test"></i>Toggle</button>
+					<!-- <button class="btn btn-info" @click="toggle"><i class="fas fa-test"></i>Toggle</button> -->
 					<div class="row ml-1" v-if="currentComponent === 'HsQuizReview'">
 						<button class="btn btn-lg btn-success" @click="submitLead">
 							<i class="fas fa-check fa-lg"></i>
