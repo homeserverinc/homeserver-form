@@ -10,9 +10,9 @@
 				<i class="fas fa-spinner fa-spin"></i> Loading...
 			</div>
 		</transition>
-		<transition name="fade" mode="in-out" appear>
+		<transition name="fade" mode="in-out" appear v-cloak>
 			<div :class="'card hs-card-'+suffixTheme">
-				<div :class="['card-header hs-card-header-'+suffixTheme, {'shadow-sm': enableShadow}]">
+				<div :class="['card-header hs-card-header-'+suffixTheme, {'shadow-sm': enableShadow}]" style="min-height: 49px">
 					<span :class="'hs-card-title-'+suffixTheme">{{ formTitle }}</span>
 					<span
 						:class="'float-right alert hs-card-title-phone-'+suffixTheme"
@@ -33,6 +33,7 @@
 					:class="['card-footer hs-card-footer-'+suffixTheme, {'shadow-sm': enableShadow, 'pb-1': currentComponent === 'HsQuizReview'}]"
 					v-if="currentComponent != 'HsFinished'"
 				>
+					<button class="btn btn-info" @click="toggle"><i class="fas fa-test"></i>Toggle</button>
 					<div class="row ml-1" v-if="currentComponent === 'HsQuizReview'">
 						<button class="btn btn-lg btn-success" @click="submitLead">
 							<i class="fas fa-check fa-lg"></i>
@@ -179,6 +180,9 @@ export default {
 		},
 		closeTermsAndConditions() {
 			this.$refs.modalTaC.hide();
+		},
+		toggle() {
+			this.$store.commit('setLoading', !this.$store.state.isLoading);
 		}
 	}
 };

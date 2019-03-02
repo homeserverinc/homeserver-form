@@ -59,11 +59,7 @@ export default new Vuex.Store({
 	actions: {
 		next({ dispatch, getters, state, commit }, component) {
 			if (component.$options._componentTag === "HsQuiz") {
-				if (
-					getters["HsQuiz/questionAnswered"](
-						state.HsQuiz.currentQuestion.uuid
-					)
-				) {
+				if (getters["HsQuiz/questionAnswered"](state.HsQuiz.currentQuestion.uuid)) {
 					if (getters["HsQuiz/nextQuestion"] == null) {
 						dispatch("HsQuiz/setAnsweredQuestion");
 						dispatch("getNext", component);
@@ -101,19 +97,11 @@ export default new Vuex.Store({
 						dispatch("preLeadStore");
 					}
 					if (state.HsCategories.categories.length > 1) {
-						commit(
-							"currentComponentIndex",
-							state.components.indexOf("HsCategories")
-						);
+						commit("currentComponentIndex", state.components.indexOf("HsCategories"));
 					} else {
-						dispatch(
-							"HsCategories/selectCategory",
-							state.HsCategories.categories[0].uuid
-						);
-						commit(
-							"currentComponentIndex",
-							state.components.indexOf("HsQuiz")
-						);
+						//dispatch("HsCategories/selectCategory", state.HsCategories.categories[0].uuid);
+						//dispatch("HsCategories/apiGetCategories", state.siteUuid);
+						commit("currentComponentIndex", state.components.indexOf("HsQuiz"));
 					}
 					break;
 

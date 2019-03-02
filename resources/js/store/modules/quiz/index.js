@@ -135,12 +135,10 @@ const actions = {
 			commit("setLoading", true, { root: true });
 		}
 		Axios.get("/quiz/" + categoryUuid)
-			.then(r => {
+			.then(async r => {
 				commit("setQuiz", r.data.data);
-				commit(
-					"setCurrentQuestion",
-					getters.question(state.quiz.first_question_uuid)
-				);
+				commit("setCurrentQuestion", getters.question(state.quiz.first_question_uuid));
+				//commit("currentComponentIndex", rootState.components.indexOf("HsQuiz"), { root: true });
 				commit("setLoading", false, { root: true });
 			})
 			.catch(e => {

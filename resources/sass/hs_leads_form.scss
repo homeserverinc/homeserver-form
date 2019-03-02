@@ -81,6 +81,8 @@ $input-types: ("checkbox", "radio");
       margin-bottom: 1rem;
       border: 1px solid transparent;
       border-radius: 0.25rem;
+      max-height: 582px;
+      overflow-x: hidden;
       @if $theme == 'light' {
         background-color: rgba(darken($color, $amount: 20), $alpha: .3);
       } @else {
@@ -225,5 +227,9 @@ $input-types: ("checkbox", "radio");
 
 .hs-p {
   text-indent: 2rem;
+}
+
+[v-cloak] {
+  display: none;
 }
 /* End other elements */
