@@ -17,8 +17,8 @@ class HomeServerApiClient {
      *
      * @var string
      */
-    protected $domain = 'https://homeserverinc.com';
-    //protected $domain = 'http://localhost:8000';
+    //protected $domain = 'https://homeserverinc.com';
+    protected $domain = 'http://localhost:8000';
 
     /**
      * Username used to access the API

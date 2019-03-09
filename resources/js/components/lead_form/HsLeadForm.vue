@@ -1,16 +1,12 @@
 <template>
 	<div>
-		<transition name="load-transition" mode="out-in">
-			<div
-				class="alert alert-success"
-				v-if="isLoading"
-				style="position: absolute; margin: auto; width: 100%; z-index=1000"
-				key="0"
-			>
-				<i class="fas fa-spinner fa-spin"></i> Loading...
+		<transition name="fade" mode="out-in">
+			<div id="loader-wrapper" v-if="isLoading">
+				<div id="loader">
+				</div>
 			</div>
 		</transition>
-		<transition name="fade" mode="in-out" appear v-cloak>
+		<transition name="fade" mode="in-out" appear v-cloak v-if="!isLoading">
 			<div :class="'card hs-card-'+suffixTheme">
 				<div :class="['card-header hs-card-header-'+suffixTheme, {'shadow-sm': enableShadow}]" style="min-height: 49px">
 					<span :class="'hs-card-title-'+suffixTheme">{{ formTitle }}</span>

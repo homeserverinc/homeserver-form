@@ -229,7 +229,10 @@ export default new Vuex.Store({
 				quiz_uuid: state.HsQuiz.quiz.uuid,
 				deadline: state.HsDetails.deadline,
 				project_details: state.HsDetails.projectDetails,
-				questions: state.HsQuiz.answeredQuestions,
+				questions: {
+					quiz: state.HsQuiz.quiz,
+					answeredQuestions: state.HsQuiz.answeredQuestions
+				},
 				verified_data: verified
 			};
 
