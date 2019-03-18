@@ -27,6 +27,8 @@
         "bootstrap-select": "^1.13.2",
         "bootstrap-vue": "^2.0.0-rc.13",
         "bootswatch": "^4.3.1",
+        "dotenv": "^7.0.0",
+        "fs": "0.0.1-security",
         "jquery-ui": "^1.12.1",
         "laravel-echo": "^1.5.3",
         "pusher-js": "^4.4.0",

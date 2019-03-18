@@ -40,6 +40,7 @@ export default new Vuex.Store({
 		suffixTheme: "info",
 		enableShadow: false,
 		leadUuid: null,
+		siteUuid: null,
 		customerUuid: null
 	},
 	getters: {
@@ -163,6 +164,8 @@ export default new Vuex.Store({
 						"currentComponentIndex",
 						state.components.indexOf("HsQuiz")
 					);
+					commit("HsQuiz/setAnswerVisible", true);
+					commit("HsQuiz/setShowQuestionTitle", true);
 					break;
 
 				case "HsDetails":
@@ -251,6 +254,9 @@ export default new Vuex.Store({
 		}
 	},
 	mutations: {
+		setSiteUuid(state, payload) {
+			state.siteUuid = payload;
+		},
 		currentComponentIndex(state, payload) {
 			state.currentComponentIndex = payload;
 		},

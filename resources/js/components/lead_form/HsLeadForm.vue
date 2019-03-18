@@ -114,7 +114,7 @@ export default {
 	props: {
 		siteUuid: {
 			type: String,
-			default: ""
+			default: ''
 		},
 		formTitle: {
 			type: String,
@@ -130,6 +130,7 @@ export default {
 		}
 	},
 	mounted() {
+		this.$store.commit('setSiteUuid', this.siteUuid)
 		this.$store.commit("setSuffixTheme", this.suffixTheme);
 		this.$store.commit("enableShadow", Boolean(this.enableShadow));
 		if (this.siteUuid != "") {
@@ -137,6 +138,9 @@ export default {
 		}
 	},
 	computed: {
+		siteUuid() {
+			return this.$store.state.siteUuid;
+		},
 		currentComponent() {
 			return this.$store.getters.currentComponent;
 		},
@@ -162,6 +166,10 @@ export default {
 		}
 	},
 	methods: {
+		//getEnv() {
+			//console.log(process.env.MIX_VUE_APP_SITE_UUID);
+			//this.$store.commit('setSiteUuid', process.env.MIX_VUE_APP_SITE_UUID); 
+		//},
 		next() {
 			this.$store.dispatch("next", this.curEl);
 		},

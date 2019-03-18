@@ -186,7 +186,7 @@ const actions = {
 	setAnsweredQuestion({ commit }) {
 		commit("setShowQuestionTitle", false);
 		commit("setAnswerVisible", false);
-		commit("addAnswerdQuestion");
+		commit("addAnsweredQuestion");
 	}
 };
 
@@ -223,7 +223,7 @@ const mutations = {
 			answer.visible = payload;
 		});
 	},
-	addAnswerdQuestion(state) {
+	addAnsweredQuestion(state) {
 		if (
 			state.answeredQuestions.some(
 				q => q.uuid === state.currentQuestion.uuid
