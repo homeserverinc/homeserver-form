@@ -138,9 +138,6 @@ export default {
 		}
 	},
 	computed: {
-		siteUuid() {
-			return this.$store.state.siteUuid;
-		},
 		currentComponent() {
 			return this.$store.getters.currentComponent;
 		},
