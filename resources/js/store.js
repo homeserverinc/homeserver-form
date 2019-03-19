@@ -217,6 +217,7 @@ export default new Vuex.Store({
 		postLead({ state, commit, getters }, verified = false) {
 			let postData = {
 				lead_uuid: state.leadUuid,
+				verified_data: verified,
 				customer: {
 					uuid: state.customerUuid,
 					first_name: state.HsNameContact.firstName,
@@ -235,10 +236,10 @@ export default new Vuex.Store({
 				questions: {
 					quiz: state.HsQuiz.quiz,
 					answeredQuestions: state.HsQuiz.answeredQuestions
-				},
-				verified_data: verified
+				}
 			};
 
+			console.log(qs.stringify(postData));
 			Axios.post("lead", qs.stringify(postData))
 				.then(async r => {
 					if (verified) {
