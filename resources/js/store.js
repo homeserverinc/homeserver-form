@@ -8,19 +8,12 @@ import HsDetails from "./store/modules/personal/HsDetails";
 import HsQuiz from "./store/modules/quiz";
 import HsCategories from "./store/modules/categories";
 import Axios from "axios";
-import qs from "qs";
+import query_string from 'query-string';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
-	modules: {
-		HsNameContact,
-		HsAddress,
-		HsDetails,
-		HsQuiz,
-		HsCategories
-	},
-	state: {
+const getInitialState = () => {
+	return {
 		components: [
 			"HsNameContact",
 			"HsCategories",
@@ -41,8 +34,23 @@ export default new Vuex.Store({
 		enableShadow: false,
 		leadUuid: null,
 		siteUuid: null,
-		customerUuid: null
+		customerUuid: null,
+		showingCancelScreen: false,
+		submitedLead: false,
+		backDisabled: false,
+		nextDisabled: false
+	}
+}
+
+export default new Vuex.Store({
+	modules: {
+		HsNameContact,
+		HsAddress,
+		HsDetails,
+		HsQuiz,
+		HsCategories
 	},
+	state: getInitialState(),
 	getters: {
 		currentComponent: state => {
 			return state.components[state.currentComponentIndex];
@@ -58,6 +66,16 @@ export default new Vuex.Store({
 		}
 	},
 	actions: {
+		enableNextButton({commit}) {
+			setTimeout(() => {
+				commit('setNextDisabled', false);
+			}, 1000);
+		},
+		enableBackButton({commit}) {
+			setTimeout(() => {
+				commit('setBackDisabled', false);
+			}, 1000);
+		},
 		next({ dispatch, getters, state, commit }, component) {
 			if (component.$options._componentTag === "HsQuiz") {
 				if (getters["HsQuiz/questionAnswered"](state.HsQuiz.currentQuestion.uuid)) {
@@ -73,10 +91,11 @@ export default new Vuex.Store({
 			} else {
 				component.$validator.validate().then(async result => {
 					if (result) {
-						dispatch("getNext", component);
-					}
+						dispatch("getNext", component);	
+					} 
 				});
 			}
+			dispatch('enableNextButton');
 		},
 		prev({ state, dispatch, commit }, component) {
 			if (component.$options._componentTag === "HsQuiz") {
@@ -98,43 +117,37 @@ export default new Vuex.Store({
 						dispatch("preLeadStore");
 					}
 					if (state.HsCategories.categories.length > 1) {
-						commit("currentComponentIndex", state.components.indexOf("HsCategories"));
-					} else {
+						commit("currentComponentIndex", state.components.indexOf("HsCategories"));					} else {
 						//dispatch("HsCategories/selectCategory", state.HsCategories.categories[0].uuid);
 						//dispatch("HsCategories/apiGetCategories", state.siteUuid);
-						commit("currentComponentIndex", state.components.indexOf("HsQuiz"));
-					}
+						commit("currentComponentIndex", state.components.indexOf("HsQuiz"));					}
 					break;
 
 				case "HsCategories":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsQuiz")
-					);
-					break;
+					);					break;
 
 				case "HsQuiz":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsAddress")
-					);
-					break;
+					);					break;
 
 				case "HsAddress":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsDetails")
-					);
-					break;
+					);					break;
 
 				case "HsDetails":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsQuizReview")
-                    );
-                    dispatch("postLead");
+					);                    dispatch("postLead");
 					break;
-			}
+			}	
 		},
 		getPrev({ state, commit }, component) {
 			let compName = component.$options._componentTag;
@@ -143,28 +156,24 @@ export default new Vuex.Store({
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsNameContact")
-					);
-					break;
+					);					break;
 
 				case "HsQuiz":
 					if (state.HsCategories.categories.length > 1) {
 						commit(
 							"currentComponentIndex",
 							state.components.indexOf("HsCategories")
-						);
-					} else {
+						);					} else {
 						commit(
 							"currentComponentIndex",
 							state.components.indexOf("HsNameContact")
-						);
-					}
+						);					}
 					break;
 				case "HsAddress":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsQuiz")
-					);
-					commit("HsQuiz/setAnswerVisible", true);
+					);					commit("HsQuiz/setAnswerVisible", true);
 					commit("HsQuiz/setShowQuestionTitle", true);
 					break;
 
@@ -172,16 +181,15 @@ export default new Vuex.Store({
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsAddress")
-					);
-					break;
+					);					break;
 
 				case "HsQuizReview":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsDetails")
-					);
-					break;
+					);					break;
 			}
+			commit('setBackDisabled', false);
 		},
 		apiGetSite({ state, commit, dispatch }, siteUuid) {
 			if (!state.isLoading) {
@@ -198,14 +206,14 @@ export default new Vuex.Store({
 		},
 		preLeadStore({ state, commit }) {
 			let postData = {
-				customer: {
+				customer: JSON.stringify({
 					first_name: state.HsNameContact.firstName,
 					last_name: state.HsNameContact.lastName,
 					email1: state.HsNameContact.email,
 					phone1: state.HsNameContact.phone
-				}
+				})
 			};
-			Axios.post("/pre_lead", qs.stringify(postData))
+			Axios.post("/pre_lead", query_string.stringify(postData))
 				.then(async r => {
 					commit("setLeadUuid", r.data.data.uuid);
 					commit("setCustomerUuid", r.data.data.customer_uuid);
@@ -218,7 +226,7 @@ export default new Vuex.Store({
 			let postData = {
 				lead_uuid: state.leadUuid,
 				verified_data: verified,
-				customer: {
+				customer: JSON.stringify({
 					uuid: state.customerUuid,
 					first_name: state.HsNameContact.firstName,
 					last_name: state.HsNameContact.lastName,
@@ -228,19 +236,22 @@ export default new Vuex.Store({
 					city: state.HsAddress.address.city,
 					state: state.HsAddress.address.state,
 					zip: state.HsAddress.address.zip
-				},
+				}),
 				category_uuid: state.HsCategories.category.uuid,
 				quiz_uuid: state.HsQuiz.quiz.uuid,
 				deadline: state.HsDetails.deadline,
 				project_details: state.HsDetails.projectDetails,
-				questions: {
+				questions: JSON.stringify({
 					quiz: state.HsQuiz.quiz,
 					answeredQuestions: state.HsQuiz.answeredQuestions
-				}
+				})
 			};
 
-			console.log(qs.stringify(postData));
-			Axios.post("lead", qs.stringify(postData))
+			if (verified) {
+				commit('setSubmitedLead');
+			}
+
+			Axios.post("lead", query_string.stringify(postData))
 				.then(async r => {
 					if (verified) {
 						commit(
@@ -252,9 +263,21 @@ export default new Vuex.Store({
 				.catch(e => {
 					console.log(e);
 				});
+		},
+		resetState({commit}) {
+			commit('resetState');
+			commit('HsCategories/resetState');
+			commit('HsAddress/resetState');
+			commit('HsDetails/resetState');
+			commit('HsNameContact/resetState');
+			commit('HsQuiz/resetState');
 		}
 	},
 	mutations: {
+		resetState(state) {
+			const s = getInitialState();
+			Object.keys(s).forEach(k => state[k] = s[k]);
+		},
 		setSiteUuid(state, payload) {
 			state.siteUuid = payload;
 		},
@@ -278,6 +301,18 @@ export default new Vuex.Store({
 		},
 		setCustomerUuid(state, payload) {
 			state.customerUuid = payload;
+		},
+		setShowingCancelScreen(state, payload) {
+			state.showingCancelScreen = payload;
+		},
+		setSubmitedLead(state) {
+			state.submitedLead = true;
+		},
+		setBackDisabled(state, payload) {
+			state.backDisabled = payload;
+		},
+		setNextDisabled(state, payload) {
+			state.nextDisabled = payload;
 		}
 	}
 });

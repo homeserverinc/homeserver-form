@@ -6,7 +6,7 @@
 				</div>
 			</div>
 		</transition>
-		<transition name="fade" mode="in-out" appear v-cloak v-if="!isLoading">
+		<transition name="fade" mode="out-in" appear v-cloak v-if="!isLoading && !showingCancelScreen">
 			<div :class="'card hs-card-'+suffixTheme">
 				<div :class="['card-header hs-card-header-'+suffixTheme, {'shadow-sm': enableShadow}]" style="min-height: 49px">
 					<span :class="'hs-card-title-'+suffixTheme">{{ formTitle }}</span>
@@ -16,12 +16,13 @@
 					>
 						<i class="fas fa-phone"></i>
 						{{ site.phone.friendly_name }}
+						<button class="btn btn-xs btn-outline btn-outline-secondary float-right ml-3" @click="cancelProject"> <i class="fas fa-times fa-sm mr-0"></i> </button>
 					</span>
 				</div>
 				<div :class="'card-body hs-card-body-'+suffixTheme">
 					<keep-alive>
 						<transition name="fade" mode="out-in" appear>
-							<component v-bind:is="currentComponent"></component>
+							<component v-bind:is="currentComponent" @onResetForm="bootstrapForm"></component>
 						</transition>
 					</keep-alive>
 				</div>
@@ -29,21 +30,20 @@
 					:class="['card-footer hs-card-footer-'+suffixTheme, {'shadow-sm': enableShadow, 'pb-1': currentComponent === 'HsQuizReview'}]"
 					v-if="currentComponent != 'HsFinished'"
 				>
-					<!-- <button class="btn btn-info" @click="toggle"><i class="fas fa-test"></i>Toggle</button> -->
 					<div class="row ml-1" v-if="currentComponent === 'HsQuizReview'">
-						<button class="btn btn-lg btn-success" @click="submitLead">
+						<button class="btn btn-lg btn-success" @click="submitLead" :disabled="submited">
 							<i class="fas fa-check fa-lg"></i>
 							Submit this project
 						</button>
 					</div>
 					<div class="row ml-1" v-else>
-						<button class="btn btn btn-info" @click="next" :disabled="nextDisabled">
+						<button class="btn btn btn-info" @click.prevent="next" :disabled="nextDisabled">
 							Next
 							<i class="fas fa-arrow-right"></i>
 						</button>
 					</div>
-					<div class="row ml-1 mt-2" v-if="!backDisabled">
-						<button class="btn btn btn-light" @click="prev">
+					<div class="row ml-1 mt-2" v-if="backVisible">
+						<button class="btn btn btn-light" @click.prevent="prev" :disabled="backDisabled">
 							<i class="fas fa-arrow-left"></i>
 							Back
 						</button>
@@ -83,6 +83,9 @@
 				</div>
 			</div>
 		</b-modal>
+		<transition name="fade" mode="out-in" appear v-cloak v-if="!isLoading && showingCancelScreen">
+			<hs-cancel-screen @onResetForm="bootstrapForm"></hs-cancel-screen>
+		</transition>
 	</div>
 </template>
 
@@ -94,6 +97,7 @@ import HsQuiz from "./quiz/HsQuiz";
 import HsCategories from "./categories/HsCategories";
 import HsQuizReview from "./review/HsQuizReview";
 import HsFinished from "./HsFinished";
+import HsCancelScreen from './HsCancelScreen';
 import bModal from "bootstrap-vue/es/components/modal/modal";
 import bModalDirective from "bootstrap-vue/es/directives/modal/modal";
 
@@ -106,6 +110,7 @@ export default {
 		HsCategories,
 		HsQuizReview,
 		HsFinished,
+		HsCancelScreen,
 		bModal
 	},
 	directives: {
@@ -130,22 +135,20 @@ export default {
 		}
 	},
 	mounted() {
-		this.$store.commit('setSiteUuid', this.siteUuid)
-		this.$store.commit("setSuffixTheme", this.suffixTheme);
-		this.$store.commit("enableShadow", Boolean(this.enableShadow));
-		if (this.siteUuid != "") {
-			this.$store.dispatch("apiGetSite", this.siteUuid);
-		}
+		this.bootstrapForm();
 	},
 	computed: {
 		currentComponent() {
 			return this.$store.getters.currentComponent;
 		},
+		backVisible() {
+			return !this.$store.getters.isFirstComponent;
+		},
 		backDisabled() {
-			return this.$store.getters.isFirstComponent;
+			 return this.$store.state.backDisabled;
 		},
 		nextDisabled() {
-			return !this.$store.getters.hasNextComponent;
+			return !this.$store.getters.hasNextComponent || this.$store.state.nextDisabled;
 		},
 		site() {
 			return this.$store.state.site;
@@ -160,17 +163,38 @@ export default {
 			return this.$children.find(
 				c => c.$options._componentTag === this.currentComponent
 			);
+		},
+		showingCancelScreen() {
+			return this.$store.state.showingCancelScreen;
+		},
+		submited() {
+			return this.$store.state.submitedLead;
 		}
 	},
-	methods: {
-		//getEnv() {
-			//console.log(process.env.MIX_VUE_APP_SITE_UUID);
-			//this.$store.commit('setSiteUuid', process.env.MIX_VUE_APP_SITE_UUID); 
-		//},
+	methods: {		
+		bootstrapForm() {
+			this.$store.commit('setSiteUuid', this.siteUuid)
+			this.$store.commit("setSuffixTheme", this.suffixTheme);
+			this.$store.commit("enableShadow", Boolean(this.enableShadow));
+			if (this.siteUuid != "") {
+				this.$store.dispatch("apiGetSite", this.siteUuid);
+			}
+		},
+		cancelProject() {
+			this.$store.commit('setShowingCancelScreen', true);
+		},
 		next() {
+			if (this.nextDisabled) {
+				return
+			}
+			this.$store.commit('setNextDisabled', true);
 			this.$store.dispatch("next", this.curEl);
 		},
 		prev() {
+			if (this.backDisabled) {
+				return
+			}
+			this.$store.commit('setBackDisabled', true);
 			this.$store.dispatch("prev", this.curEl);
 		},
 		submitLead() {

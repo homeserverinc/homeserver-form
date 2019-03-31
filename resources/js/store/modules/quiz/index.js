@@ -1,17 +1,21 @@
 import Axios from "axios";
 import { QUESTION_TYPES, ANSWER_TYPES } from "../../../constants";
 
-const state = {
-	quiz: {},
-	answeredQuestions: [],
-	answerTypes: ANSWER_TYPES,
-	questionTypes: QUESTION_TYPES,
-	currentQuestion: {
-    answers: []
-  },
-	showQuestionTitle: true,
-	currentQuestionAnswered: null
-};
+const getInitialState = () => {
+	return {
+		quiz: {},
+		answeredQuestions: [],
+		answerTypes: ANSWER_TYPES,
+		questionTypes: QUESTION_TYPES,
+		currentQuestion: {
+			answers: []
+		},
+		showQuestionTitle: true,
+		currentQuestionAnswered: null
+	}
+}
+
+const state = getInitialState();
 
 const getters = {
 	question: state => uuid => {
@@ -138,7 +142,6 @@ const actions = {
 			.then(async r => {
 				commit("setQuiz", r.data.data);
 				commit("setCurrentQuestion", getters.question(state.quiz.first_question_uuid));
-				//commit("currentComponentIndex", rootState.components.indexOf("HsQuiz"), { root: true });
 				commit("setLoading", false, { root: true });
 			})
 			.catch(e => {
@@ -191,6 +194,10 @@ const actions = {
 };
 
 const mutations = {
+	resetState(state) {
+		const s = getInitialState();
+		Object.keys(s).forEach(k => state[k] = s[k]);
+	},
 	setQuiz(state, payload) {
 		state.quiz = payload;
 	},

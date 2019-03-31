@@ -12,15 +12,19 @@ var getAddressPart = (obj, part, shortName = true) => {
 	}
 };
 
-const state = {
-	apiResObj: {},
-	address: {
-		street: "",
-		city: "",
-		state: "",
-		zip: ""
+const getInitialState = () => {
+	return {
+		apiResObj: {},
+		address: {
+			street: "",
+			city: "",
+			state: "",
+			zip: ""
+		}
 	}
-};
+}
+
+const state = getInitialState();
 
 const getters = {
 	getField
@@ -44,6 +48,10 @@ const actions = {
 
 const mutations = {
 	updateField,
+	resetState(state) {
+		const s = getInitialState();
+		Object.keys(s).forEach(k => state[k] = s[k]);
+	},
 	apiResObj(state, payload) {
 		state.apiResObj = payload;
 	},

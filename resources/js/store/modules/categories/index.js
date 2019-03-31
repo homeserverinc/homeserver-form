@@ -1,9 +1,13 @@
 import Axios from "axios";
 
-const state = {
-	category: {},
-	categories: []
-};
+const getInitialState = () => {
+	return {
+		category: {},
+		categories: []
+	}
+}
+
+const state = getInitialState();
 
 const getters = {};
 
@@ -35,6 +39,10 @@ const actions = {
 };
 
 const mutations = {
+	resetState(state) {
+		const s = getInitialState();
+		Object.keys(s).forEach(k => state[k] = s[k]);
+	},
 	setCategories(state, payload) {
 		state.categories = payload;
 	},

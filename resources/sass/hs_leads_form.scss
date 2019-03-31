@@ -163,6 +163,19 @@ $input-types: ("checkbox", "radio");
     }
   }
 }
+
+.btn-group-xs > .btn, .btn-xs {
+  padding  : .25rem .4rem;
+  font-size  : .875rem;
+  line-height  : .5;
+  border-radius : .2rem;
+}
+
+.hs-jumbotron-fullscreen {
+  height: 90vh;
+  margin-bottom: 0; 
+}
+
 /* End components */
 
 /* Begin transactions */

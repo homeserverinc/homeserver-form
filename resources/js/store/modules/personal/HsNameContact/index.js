@@ -1,11 +1,15 @@
 import { getField, updateField } from "vuex-map-fields";
 
-const state = {
-	firstName: "",
-	lastName: "",
-	email: "",
-	phone: ""
-};
+const getInitialState = () => {
+	return {
+		firstName: "",
+		lastName: "",
+		email: "",
+		phone: ""
+	}
+}
+
+const state = getInitialState();
 
 const getters = {
 	getField
@@ -14,7 +18,11 @@ const getters = {
 const actions = {};
 
 const mutations = {
-	updateField
+	updateField,
+	resetState(state) {
+		const s = getInitialState();
+		Object.keys(s).forEach(k => state[k] = s[k]);
+	},
 };
 
 const namespaced = true;

@@ -4,7 +4,7 @@
 		<p class="lead">Thank you for contact us. The pros will be in touch in order to complete your project requirements.</p>
 		<hr class="my-4">
 		<p>Click on the button below to close this window.</p>
-		<button class="btn btn-success btn-lg" data-dismiss="modal" type="button">
+		<button class="btn btn-success btn-lg" data-dismiss="modal" type="button" @click="resetState">
             <i class="fas fa-times fa-lg"></i>
             Close
         </button>
@@ -13,5 +13,12 @@
 
 
 <script>
-export default {};
+export default {
+	methods: {
+		resetState() {
+			this.$store.dispatch('resetState');
+			this.$emit('onResetForm');
+		}
+	}
+};
 </script>

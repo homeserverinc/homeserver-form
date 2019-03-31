@@ -2,5 +2,6 @@
     "/public/js/app.js": "/public/js/app.js",
     "/public/css/app.css": "/public/css/app.css",
     "/public/css/hs_leads_form.css": "/public/css/hs_leads_form.css",
+    "/public/js/debug.js": "/public/js/debug.js",
     "/public/js/leadform.js": "/public/js/leadform.js"
 }

@@ -33,6 +33,7 @@
         "laravel-echo": "^1.5.3",
         "pusher-js": "^4.4.0",
         "qs": "^6.6.0",
+        "query-string": "^6.4.0",
         "toaster": "^0.1.2",
         "vee-validate": "^2.1.7",
         "velocity-animate": "^1.5.2",
