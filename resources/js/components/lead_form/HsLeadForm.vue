@@ -26,63 +26,52 @@
 						</transition>
 					</keep-alive>
 				</div>
-				<div
-					:class="['card-footer hs-card-footer-'+suffixTheme, {'shadow-sm': enableShadow, 'pb-1': currentComponent === 'HsQuizReview'}]"
-					v-if="currentComponent != 'HsFinished'"
-				>
-					<div class="row ml-1" v-if="currentComponent === 'HsQuizReview'">
-						<button class="btn btn-lg btn-success" @click="submitLead" :disabled="submited">
-							<i class="fas fa-check fa-lg"></i>
-							Submit this project
-						</button>
-					</div>
-					<div class="row ml-1" v-else>
-						<button class="btn btn btn-info" @click.prevent="next" :disabled="nextDisabled">
-							Next
-							<i class="fas fa-arrow-right"></i>
-						</button>
-					</div>
-					<div class="row ml-1 mt-2" v-if="backVisible">
-						<button class="btn btn btn-light" @click.prevent="prev" :disabled="backDisabled">
-							<i class="fas fa-arrow-left"></i>
-							Back
-						</button>
+				<div :class="['card-footer pb-0 hs-card-footer-'+suffixTheme, {'shadow-sm': enableShadow}]" v-if="currentComponent != 'HsFinished'">
+					<div class="row">
+						<div class="col col-md-3">
+							<div class="row ml-1" v-if="currentComponent === 'HsQuizReview'">
+								<button class="btn btn-lg btn-success" @click="submitLead" :disabled="submited">
+									<i class="fas fa-check fa-lg"></i>
+									Submit this project
+								</button>
+							</div>
+							<div class="row ml-1" v-else>
+								<button class="btn btn btn-info" @click.prevent="next" :disabled="nextDisabled">
+									Next
+									<i class="fas fa-arrow-right"></i>
+								</button>
+							</div>
+							<div class="row ml-1 mt-2" v-if="backVisible">
+								<button class="btn btn btn-light" @click.prevent="prev" :disabled="backDisabled">
+									<i class="fas fa-arrow-left"></i>
+									Back
+								</button>
+							</div>
+						</div>
+						<div class="col col-md-9">
+							<div v-if="currentComponent === 'HsQuizReview'">
+								<div class="d-block text-justify hs-terms-conditions">
+									<p class="hs-p">
+										By submitting your contact information, you understand and agree that you may be contacted by few independent service providers and/or our partners regarding your home service request, using email, telephone or text messaging - including through autodialed and/or prerecorded calls or messages - to the telephone number provided above, which may include your mobile telephone number, if provided. 
+									</p>
+									<p class="hs-p">
+										You understand that consent is not a condition of purchase. Please note that this website connects consumers looking for home improvement services with a network of independent service providers, when it is unavailable to provide direct home repair or maintenance services.
+									</p>
+								</div>
+							</div>
+						</div>
 					</div>
 
-					<div class="row mt-3" v-if="currentComponent === 'HsQuizReview'">
+					<div class="row mt-3">
 						<div class="col border-top p-1">
 							<p class="hs-terms-conditions text-center m-0">
-								{{ thisYear }} all rigths reserveds. By submitting this form, you agree with our
-								<a
-									href="#"
-									class="btn-link"
-									@click.prevent="openTermsAndConditions"
-								>Terms and Conditions</a>.
+								{{ thisYear }} {{site.name}} - All rigths reserveds.
 							</p>
 						</div>
 					</div>
 				</div>
 			</div>
 		</transition>
-		<b-modal ref="modalTaC" hide-footer title="Terms and Conditions">
-			<div class="d-block text-justify">
-				<p class="hs-p">
-                    By submitting your contact information, you understand and agree that you may be contacted by few independent service providers and/or our partners regarding your home service request, using email, telephone or text messaging - including through autodialed and/or prerecorded calls or messages - to the telephone number provided above, which may include your mobile telephone number, if provided. 
-                </p>
-                <p class="hs-p">
-                    You understand that consent is not a condition of purchase. Please note that this website connects consumers looking for home improvement services with a network of independent service providers, when it is unavailable to provide direct home repair or maintenance services.
-                </p>
-			</div>
-
-			<div class="form-group mt-3 mb-0">
-				<div class="row border-top pt-3 pl-3">
-					<button class="btn btn-secondary" @click="closeTermsAndConditions">
-						<i class="fas fa-times"></i>
-						Close
-					</button>
-				</div>
-			</div>
-		</b-modal>
 		<transition name="fade" mode="out-in" appear v-cloak v-if="!isLoading && showingCancelScreen">
 			<hs-cancel-screen @onResetForm="bootstrapForm"></hs-cancel-screen>
 		</transition>
@@ -199,12 +188,6 @@ export default {
 		},
 		submitLead() {
 			this.$store.dispatch("postLead", true);
-		},
-		openTermsAndConditions() {
-			this.$refs.modalTaC.show();
-		},
-		closeTermsAndConditions() {
-			this.$refs.modalTaC.hide();
 		},
 		toggle() {
 			this.$store.commit('setLoading', !this.$store.state.isLoading);

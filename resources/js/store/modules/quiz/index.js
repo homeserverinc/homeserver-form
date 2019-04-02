@@ -173,12 +173,21 @@ const actions = {
 			commit("setAnswerVisible", false);
 		}
 		let prevq = getters.prevQuestion;
+		if (prevq.uuid == state.currentQuestion.uuid) {
+			commit("setCurrentQuestionAnswered", null);
+			commit("setCurrentQuestion", getters.question(prevq.uuid));
+			commit("setSelectedAnswer", prevq.selected_answers);
+			commit("popAnsweredQuesiton");
+		}
+		prevq = getters.prevQuestion;
+		//console.log(prevq);
 		commit("setCurrentQuestionAnswered", null);
 		commit("setCurrentQuestion", getters.question(prevq.uuid));
 		commit("setSelectedAnswer", prevq.selected_answers);
 		commit("popAnsweredQuesiton");
 		commit("setAnswerVisible", true);
 		commit("setShowQuestionTitle", true);
+		commit("setBackDisabled", false, {root: true});
 	},
 	answerCurrentQuestion({ commit, dispatch, getters }, q) {
 		commit("setSelectedAnswer", { uuid: q.uuid });

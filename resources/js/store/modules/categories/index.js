@@ -25,6 +25,7 @@ const actions = {
 					//commit("currentComponentIndex", rootState.components.indexOf("HsCategories"), { root: true });
 					commit("setLoading", false, { root: true });
 				}
+				dispatch('initComponent', null, {root: true});
 			})
 			.catch(e => {
 				console.log(e);

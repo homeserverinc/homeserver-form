@@ -15,9 +15,9 @@ Vue.use(Vuex);
 const getInitialState = () => {
 	return {
 		components: [
-			"HsNameContact",
-			"HsCategories",
 			"HsQuiz",
+			"HsCategories",
+			"HsNameContact",
 			"HsAddress",
 			"HsDetails",
 			"HsQuizReview",
@@ -56,7 +56,10 @@ export default new Vuex.Store({
 			return state.components[state.currentComponentIndex];
 		},
 		isFirstComponent: state => {
-			return state.currentComponentIndex === 0;
+			return (((state.HsCategories.categories.length > 1) && state.currentComponentIndex == 1)
+					|| (state.HsCategories.categories.length == 1) && (state.currentComponentIndex == 0) &&
+					(state.HsQuiz.answeredQuestions.length == 0));
+					
 		},
 		hasNextComponent: state => {
 			return state.currentComponentIndex < state.components.length;
@@ -67,14 +70,14 @@ export default new Vuex.Store({
 	},
 	actions: {
 		enableNextButton({commit}) {
-			setTimeout(() => {
+			setTimeout(() => { 
 				commit('setNextDisabled', false);
-			}, 1000);
+			}, 500);
 		},
 		enableBackButton({commit}) {
 			setTimeout(() => {
 				commit('setBackDisabled', false);
-			}, 1000);
+			}, 500);
 		},
 		next({ dispatch, getters, state, commit }, component) {
 			if (component.$options._componentTag === "HsQuiz") {
@@ -113,33 +116,32 @@ export default new Vuex.Store({
 			let compName = component.$options._componentTag;
 			switch (compName) {
 				case "HsNameContact":
-					if (state.leadUuid === null) {
+					/* if (state.leadUuid === null) {
 						dispatch("preLeadStore");
-					}
-					if (state.HsCategories.categories.length > 1) {
-						commit("currentComponentIndex", state.components.indexOf("HsCategories"));					} else {
-						//dispatch("HsCategories/selectCategory", state.HsCategories.categories[0].uuid);
-						//dispatch("HsCategories/apiGetCategories", state.siteUuid);
-						commit("currentComponentIndex", state.components.indexOf("HsQuiz"));					}
+					} */
+					commit("currentComponentIndex", state.components.indexOf("HsAddress"));
 					break;
 
 				case "HsCategories":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsQuiz")
-					);					break;
+					);					
+					break;
 
 				case "HsQuiz":
 					commit(
 						"currentComponentIndex",
-						state.components.indexOf("HsAddress")
-					);					break;
+						state.components.indexOf("HsNameContact")
+					);					
+					break;
 
 				case "HsAddress":
 					commit(
 						"currentComponentIndex",
 						state.components.indexOf("HsDetails")
-					);					break;
+					);					
+					break;
 
 				case "HsDetails":
 					commit(
@@ -152,28 +154,21 @@ export default new Vuex.Store({
 		getPrev({ state, commit }, component) {
 			let compName = component.$options._componentTag;
 			switch (compName) {
-				case "HsCategories":
-					commit(
-						"currentComponentIndex",
-						state.components.indexOf("HsNameContact")
-					);					break;
-
 				case "HsQuiz":
 					if (state.HsCategories.categories.length > 1) {
 						commit(
 							"currentComponentIndex",
 							state.components.indexOf("HsCategories")
-						);					} else {
-						commit(
-							"currentComponentIndex",
-							state.components.indexOf("HsNameContact")
-						);					}
+						);					
+					} 
 					break;
 				case "HsAddress":
-					commit(
-						"currentComponentIndex",
-						state.components.indexOf("HsQuiz")
-					);					commit("HsQuiz/setAnswerVisible", true);
+					commit("currentComponentIndex", state.components.indexOf("HsNameContact"));					
+					break;
+				
+				case "HsNameContact":
+					commit("currentComponentIndex", state.components.indexOf("HsQuiz"));					
+					commit("HsQuiz/setAnswerVisible", true);
 					commit("HsQuiz/setShowQuestionTitle", true);
 					break;
 
@@ -198,11 +193,18 @@ export default new Vuex.Store({
 			Axios.get("/site/" + siteUuid)
 				.then(async r => {
 					commit("setSite", r.data.data);
-					dispatch("HsCategories/apiGetCategories", state.site.uuid);
+					dispatch("HsCategories/apiGetCategories", state.site.uuid);				
 				})
 				.catch(e => {
 					console.log(e);
 				});
+		},
+		initComponent({state, commit}) {
+			if (state.HsCategories.categories.length == 1) {
+				commit("currentComponentIndex", state.components.indexOf("HsQuiz"));
+			} else {
+				commit("currentComponentIndex", state.components.indexOf("HsCategories"));
+			}
 		},
 		preLeadStore({ state, commit }) {
 			let postData = {

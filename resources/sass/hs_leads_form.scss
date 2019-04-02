@@ -228,7 +228,7 @@ $input-types: ("checkbox", "radio");
 /* Beign other elements */
 
 .hs-terms-conditions {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
 }
 
 .hs-invalid-feedback {
@@ -240,7 +240,8 @@ $input-types: ("checkbox", "radio");
 }
 
 .hs-p {
-  text-indent: 2rem;
+  text-indent: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 [v-cloak] {
